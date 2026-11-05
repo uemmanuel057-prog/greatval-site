@@ -32,8 +32,8 @@ export const pillars: Pillar[] = [
     summary:
       "A Computer Science foundation applied to real businesses and real systems.",
     highlights: [
-      "Next.js web systems",
-      "Custom automations",
+      "Web development with Next.js, React & TypeScript",
+      "Custom automations (Make.com, Notion API)",
       "IP CCTV and solar power engineering",
     ],
   },

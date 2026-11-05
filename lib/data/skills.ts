@@ -3,8 +3,15 @@ import type { SkillGroup } from "@/lib/types";
 export const skillGroups: SkillGroup[] = [
   {
     id: "build",
-    title: "Build",
-    skills: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    title: "Web Development",
+    skills: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Git & GitHub",
+      "Vercel deployment",
+    ],
   },
   {
     id: "grow",
