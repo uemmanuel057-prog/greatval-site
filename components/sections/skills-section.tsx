@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { Reveal } from "@/components/motion/reveal";
 import { skillGroups } from "@/lib/data/skills";
 
 export function SkillsSection() {
@@ -10,28 +11,47 @@ export function SkillsSection() {
       className="border-b border-line bg-raised py-20 sm:py-28"
     >
       <Container>
-        <SectionHeading
-          id="skills-title"
-          eyebrow="Skill stack"
-          title="The toolkit."
-        />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {skillGroups.map((group) => (
-            <div key={group.id} className="card">
-              <h3 className="text-lg">{group.title}</h3>
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {group.skills.map((skill) => (
-                  <li
-                    key={skill}
-                    className="rounded-full border border-line-strong px-3 py-1 text-sm text-ink-muted"
-                  >
-                    {skill}
-                  </li>
-                ))}
-              </ul>
+        <Reveal>
+          <SectionHeading
+            id="skills-title"
+            eyebrow="Skill stack"
+            title="The toolkit."
+          />
+        </Reveal>
+
+        <Reveal>
+          <div className="glass overflow-hidden rounded-2xl">
+            {/* Code-window chrome */}
+            <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3">
+              <span className="size-3 rounded-full bg-white/15" />
+              <span className="size-3 rounded-full bg-white/15" />
+              <span className="size-3 rounded-full bg-accent/70" />
+              <span className="ml-3 font-mono text-xs text-ink-subtle">
+                stack.ts
+              </span>
             </div>
-          ))}
-        </div>
+            <div className="grid gap-8 p-6 sm:grid-cols-2 sm:p-8">
+              {skillGroups.map((group) => (
+                <div key={group.id}>
+                  <p className="font-mono text-sm text-code">
+                    {"// "}
+                    {group.title.toLowerCase()}
+                  </p>
+                  <ul className="mt-4 flex flex-wrap gap-2">
+                    {group.skills.map((skill) => (
+                      <li
+                        key={skill}
+                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-code/50 hover:text-code sm:text-sm"
+                      >
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
       </Container>
     </section>
   );

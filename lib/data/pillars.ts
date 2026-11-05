@@ -8,9 +8,9 @@ export const pillars: Pillar[] = [
     summary:
       "Storytelling and media production, from podcasting to live multi-camera broadcasts.",
     highlights: [
-      'Podcast host — "One Brick at a Time"',
       "Live multi-cam broadcasting (vMix / OBS)",
-      "Short-form storytelling",
+      'Podcasting — "One Brick at a Time"',
+      "Video production and short-form storytelling",
     ],
   },
   {
@@ -20,9 +20,9 @@ export const pillars: Pillar[] = [
     summary:
       "Practical growth work that helps brands get seen and get responses.",
     highlights: [
-      "Meta & Google Ads campaigns",
-      "Direct-response copywriting",
-      "Audience growth architecture",
+      "Meta & Google Ads management",
+      "Copywriting and ghostwriting",
+      "Digital visibility and audience growth",
     ],
   },
   {
@@ -33,8 +33,8 @@ export const pillars: Pillar[] = [
       "A Computer Science foundation applied to real businesses and real systems.",
     highlights: [
       "Web development with Next.js, React & TypeScript",
-      "Custom automations (Make.com, Notion API)",
-      "IP CCTV and solar power engineering",
+      "Custom APIs and automations (Make.com, Notion API)",
+      "Solar power systems and IP CCTV setups",
     ],
   },
   {
@@ -45,8 +45,8 @@ export const pillars: Pillar[] = [
       "Documenting the work as it happens, so others can learn from the process.",
     highlights: [
       'Book — "No Capital, No Noise"',
-      "Routine documentation",
-      "Practical execution frameworks",
+      "Digital resources",
+      "Execution logs and practical frameworks",
     ],
   },
 ];

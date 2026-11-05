@@ -1,6 +1,8 @@
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { ventures } from "@/lib/data/ventures";
+import { Reveal } from "@/components/motion/reveal";
+import { VenturesShowcase } from "@/components/sections/ventures-showcase";
+import { clientSupport, ventures } from "@/lib/data/ventures";
 
 export function VenturesSection() {
   return (
@@ -10,24 +12,37 @@ export function VenturesSection() {
       className="border-b border-line py-20 sm:py-28"
     >
       <Container>
-        <SectionHeading
-          id="ventures-title"
-          eyebrow="Ventures & work"
-          title="Where the work happens."
-          description="Verified roles across media, technology, talent, production, and client growth."
-        />
-        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {ventures.map((venture) => (
-            <li key={venture.id} className="card card-hover flex flex-col">
-              <p className="eyebrow">{venture.category}</p>
-              <h3 className="mt-3 text-xl sm:text-2xl">{venture.name}</h3>
-              <p className="mt-2 text-sm font-semibold text-accent">
-                {venture.role}
+        <Reveal>
+          <SectionHeading
+            id="ventures-title"
+            eyebrow="Featured ventures"
+            title="Where the work happens."
+            description="Verified roles across media, technology, talent, and production."
+          />
+        </Reveal>
+
+        <VenturesShowcase ventures={ventures} />
+
+        <Reveal className="mt-10">
+          <div className="glass flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div>
+              <p className="eyebrow">Also supporting</p>
+              <p className="mt-1 text-sm text-ink-muted">
+                {clientSupport.role} · {clientSupport.scope}
               </p>
-              <p className="mt-4 text-ink-muted">{venture.scope}</p>
-            </li>
-          ))}
-        </ul>
+            </div>
+            <ul className="flex flex-wrap gap-2">
+              {clientSupport.brands.map((brand) => (
+                <li
+                  key={brand}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-ink"
+                >
+                  {brand}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
       </Container>
     </section>
   );

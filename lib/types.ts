@@ -18,8 +18,15 @@ export interface Venture {
   name: string;
   role: string;
   scope: string;
-  /** Optional short tag shown on the card, e.g. "Media" or "Technology". */
-  category: "Media" | "Technology" | "Talent" | "Production" | "Growth";
+  category: "Media" | "Technology" | "Talent" | "Production";
+  /** Short keywords taken directly from the verified scope. */
+  tags: string[];
+}
+
+export interface ClientSupport {
+  role: string;
+  scope: string;
+  brands: string[];
 }
 
 export interface SkillGroup {

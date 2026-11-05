@@ -2,30 +2,38 @@
 
 /* ==========================================================================
    GREAT VAL — Global Design System
-   Dark editorial · premium · minimal · restrained amber accent
+   Dark Velvet Obsidian · Electric Gold · Neon Cyan · glass surfaces
    ========================================================================== */
 
 @theme inline {
   /* Surfaces */
-  --color-canvas: #09090b;
-  --color-raised: #121215;
-  --color-surface: #18181b;
-  --color-surface-hover: #27272a;
-  --color-line: #27272a;
-  --color-line-strong: #3f3f46;
+  --color-canvas: #0b0f17;
+  --color-raised: #0e131d;
+  --color-surface: #121824;
+  --color-surface-hover: #1a2233;
+  --color-line: #1e2638;
+  --color-line-strong: #2d3750;
 
   /* Text */
-  --color-ink: #f4f4f5;
-  --color-ink-muted: #a1a1aa;
-  --color-ink-subtle: #71717a;
+  --color-ink: #f8fafc;
+  --color-ink-muted: #94a3b8;
+  --color-ink-subtle: #64748b;
 
-  /* Brand accent (warm amber / gold) */
-  --color-accent: #f59e0b;
-  --color-accent-deep: #d97706;
+  /* Highlights */
+  --color-accent: #e5a93c; /* Electric Gold */
+  --color-accent-deep: #c98a1b;
+  --color-code: #38bdf8; /* Neon Cyan, code accents */
 
-  /* Fonts (variables injected by next/font in layout.tsx) */
+  /* Fonts (variables injected by the geist package in layout.tsx) */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Animatable angle for the rotating border beam */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 :root {
@@ -34,7 +42,6 @@
 
 html {
   scroll-behavior: smooth;
-  /* Keeps anchor targets clear of the sticky header */
   scroll-padding-top: 5rem;
 }
 
@@ -43,8 +50,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   line-height: 1.65;
-  /* Safety net: no horizontal scroll on any screen */
-  overflow-x: clip;
+  overflow-x: clip; /* safety net: never scroll sideways */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -64,26 +70,98 @@ p {
 }
 
 ::selection {
-  background: var(--color-accent-deep);
-  color: #09090b;
+  background: var(--color-accent);
+  color: #0b0f17;
 }
 
-/* Visible keyboard focus everywhere */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+/* ---- Keyframes ---------------------------------------------------------- */
+
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
   }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -14px;
+  }
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    translate: -40px -20px;
+  }
+  50% {
+    translate: 40px 30px;
+  }
+}
+
+@keyframes ping-dot {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* ---- Utilities (usable with @apply and directly in markup) ------------- */
+
+/* Frosted glass surface */
+@utility glass {
+  background: rgb(255 255 255 / 0.04);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow:
+    0 18px 50px -20px rgb(0 0 0 / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+/* Rotating light beam around the border.
+   Shows on hover, or always with data-beam="always". */
+@utility beam {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--beam-angle),
+      transparent 0 62%,
+      var(--color-accent) 82%,
+      var(--color-code) 94%,
+      transparent 100%
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    animation: beam-spin 4.5s linear infinite;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  &:hover::before,
+  &:focus-within::before,
+  &[data-beam="always"]::before {
+    opacity: 1;
   }
 }
 
@@ -94,19 +172,88 @@ p {
     @apply font-mono text-xs uppercase tracking-[0.2em] text-accent;
   }
 
-  .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-canvas transition-colors hover:bg-accent-deep;
-  }
-
-  .btn-ghost {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-line-strong px-6 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent;
-  }
-
   .card {
-    @apply rounded-2xl border border-line bg-surface/60 p-6 transition-colors sm:p-7;
+    @apply glass rounded-2xl p-6 sm:p-7;
   }
 
-  .card-hover {
-    @apply hover:border-line-strong hover:bg-surface;
+  /* Buttons */
+  .btn-gold {
+    @apply beam inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-7 text-sm font-semibold text-canvas transition-shadow;
+    box-shadow: 0 0 0 1px rgb(229 169 60 / 0.4), 0 10px 40px -8px rgb(229 169 60 / 0.55);
+  }
+  .btn-gold:hover {
+    box-shadow: 0 0 0 1px rgb(229 169 60 / 0.7), 0 14px 50px -6px rgb(229 169 60 / 0.8);
+  }
+
+  .btn-glass {
+    @apply glass beam inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold text-ink transition-colors;
+  }
+  .btn-glass:hover {
+    border-color: rgb(229 169 60 / 0.5);
+  }
+
+  .float-a {
+    animation: float-y 6s ease-in-out infinite;
+  }
+  .float-b {
+    animation: float-y 7.5s ease-in-out infinite 0.8s;
+  }
+  .float-c {
+    animation: float-y 6.8s ease-in-out infinite 1.6s;
+  }
+  .orb-drift {
+    animation: orb-drift 14s ease-in-out infinite;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at 50% 30%, #000 15%, transparent 72%);
+    -webkit-mask-image: radial-gradient(
+      ellipse at 50% 30%,
+      #000 15%,
+      transparent 72%
+    );
+  }
+
+  .pulse-dot {
+    position: relative;
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: #22c55e;
+  }
+  .pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #22c55e;
+    animation: ping-dot 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Calm version for visitors who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .beam::before,
+  .float-a,
+  .float-b,
+  .float-c,
+  .orb-drift,
+  .pulse-dot::after {
+    animation: none;
   }
 }
