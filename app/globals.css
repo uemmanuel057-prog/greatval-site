@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   GREAT VAL — Global Design System
+   Dark editorial · premium · minimal · restrained amber accent
+   ========================================================================== */
+
+@theme inline {
+  /* Surfaces */
+  --color-canvas: #09090b;
+  --color-raised: #121215;
+  --color-surface: #18181b;
+  --color-surface-hover: #27272a;
+  --color-line: #27272a;
+  --color-line-strong: #3f3f46;
+
+  /* Text */
+  --color-ink: #f4f4f5;
+  --color-ink-muted: #a1a1aa;
+  --color-ink-subtle: #71717a;
+
+  /* Brand accent (warm amber / gold) */
+  --color-accent: #f59e0b;
+  --color-accent-deep: #d97706;
+
+  /* Fonts (variables injected by next/font in layout.tsx) */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Keeps anchor targets clear of the sticky header */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  /* Safety net: no horizontal scroll on any screen */
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--color-accent-deep);
+  color: #09090b;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Reusable component classes ---------------------------------------- */
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.2em] text-accent;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-canvas transition-colors hover:bg-accent-deep;
+  }
+
+  .btn-ghost {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-line-strong px-6 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-surface/60 p-6 transition-colors sm:p-7;
+  }
+
+  .card-hover {
+    @apply hover:border-line-strong hover:bg-surface;
+  }
+}
