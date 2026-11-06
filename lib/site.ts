@@ -13,7 +13,14 @@ export const siteConfig = {
     "GREAT VAL is a web developer, creator, marketer and strategist, and entrepreneur — building ideas, creating value, and documenting growth in public.",
   role: "Web Developer · Creator · Marketer & Strategist · Entrepreneur",
   email: "uemmanuel057@gmail.com",
+  /** WhatsApp number in international format, digits only (no + or spaces). */
+  whatsapp: "2348105196360",
+  whatsappMessage:
+    "Hi GREAT VAL, I found you through your website and I'd like to talk about a project. Here is what I need: ",
 } as const;
+
+/** Opens a WhatsApp chat with the owner, with the starter message filled in. */
+export const whatsappHref = `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(siteConfig.whatsappMessage)}`;
 
 /** Social profiles supplied by the owner. Add new ones here and they appear everywhere. */
 export const socialLinks: SocialLink[] = [

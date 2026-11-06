@@ -1,11 +1,11 @@
-import { Mail } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Portrait } from "@/components/ui/portrait";
 import { SocialLinks } from "@/components/ui/social-links";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { Magnetic } from "@/components/motion/magnetic";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, whatsappHref } from "@/lib/site";
 import { sectionSpacing } from "@/lib/section-style";
 import type { SectionProps } from "@/lib/types";
 import contactPhoto from "@/public/images/great-val-contact.webp";
@@ -55,7 +55,7 @@ export function ContactSection({ page = false }: SectionProps) {
                 Web projects, brand growth, media production, or
                 collaboration. Send a message and I&apos;ll get back to you.
               </p>
-              <div className="mt-6">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Magnetic>
                   <a
                     href={`mailto:${siteConfig.email}?subject=Hello%20GREAT%20VAL`}
@@ -63,6 +63,17 @@ export function ContactSection({ page = false }: SectionProps) {
                     className="btn-gold"
                   >
                     Send an email
+                  </a>
+                </Magnetic>
+                <Magnetic>
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-glass"
+                  >
+                    <MessageCircle size={18} aria-hidden="true" />
+                    Chat on WhatsApp
                   </a>
                 </Magnetic>
               </div>
