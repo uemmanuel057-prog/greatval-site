@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { SocialLinks } from "@/components/ui/social-links";
 import { navItems, siteConfig } from "@/lib/site";
 
 export function SiteFooter() {
@@ -14,6 +15,8 @@ export function SiteFooter() {
             <p className="mt-4 max-w-md text-ink-muted">
               {siteConfig.tagline}
             </p>
+            <p className="eyebrow mb-4 mt-8">Connect</p>
+            <SocialLinks />
           </div>
 
           <nav aria-label="Footer">

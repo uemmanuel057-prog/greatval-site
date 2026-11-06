@@ -15,6 +15,13 @@ export interface SectionProps {
   page?: boolean;
 }
 
+export interface SocialLink {
+  label: string;
+  href: string;
+  /** Shown beside the label when a confirmed handle exists. */
+  handle?: string;
+}
+
 export interface Pillar {
   id: string;
   index: string; // "01" – "04"

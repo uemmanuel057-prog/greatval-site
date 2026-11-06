@@ -1,4 +1,4 @@
-import type { NavItem, SitePage } from "@/lib/types";
+import type { NavItem, SitePage, SocialLink } from "@/lib/types";
 
 /**
  * Central site configuration.
@@ -14,6 +14,28 @@ export const siteConfig = {
   role: "Web Developer · Creator · Marketer & Strategist · Entrepreneur",
   email: "uemmanuel057@gmail.com",
 } as const;
+
+/** Social profiles supplied by the owner. Add new ones here and they appear everywhere. */
+export const socialLinks: SocialLink[] = [
+  {
+    label: "LinkedIn",
+    href: "https://ng.linkedin.com/in/valentine-emmanuel-ikechukwu-great-val-541314234",
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/official_valentine_emmanuel",
+    handle: "@official_valentine_emmanuel",
+  },
+  {
+    label: "X",
+    href: "https://x.com/GreatValcfr",
+    handle: "@GreatValcfr",
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/share/1FHJH5EgKh/",
+  },
+];
 
 /** Every page on the site, in navigation order. */
 export const sitePages: SitePage[] = [

@@ -1,6 +1,7 @@
 import { Mail } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Portrait } from "@/components/ui/portrait";
+import { SocialLinks } from "@/components/ui/social-links";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -9,10 +10,7 @@ import { sectionSpacing } from "@/lib/section-style";
 import type { SectionProps } from "@/lib/types";
 import contactPhoto from "@/public/images/great-val-contact.webp";
 
-/**
- * Contact section.
- * TODO: add confirmed social links here once the user provides them.
- */
+/** Contact section: email first, then the social profiles from `lib/site.ts`. */
 export function ContactSection({ page = false }: SectionProps) {
   return (
     <section
@@ -69,6 +67,10 @@ export function ContactSection({ page = false }: SectionProps) {
                 </Magnetic>
               </div>
             </div>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <p className="eyebrow mb-4 mt-10">Or find me on</p>
+            <SocialLinks />
           </Reveal>
         </div>
 
