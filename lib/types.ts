@@ -29,6 +29,18 @@ export interface ClientSupport {
   brands: string[];
 }
 
+export interface WebProject {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  /** Live URL supplied by the owner. */
+  url: string;
+  highlights: string[];
+  /** True for the portfolio site itself. */
+  isThisSite?: boolean;
+}
+
 export interface SkillGroup {
   id: string;
   title: string;
