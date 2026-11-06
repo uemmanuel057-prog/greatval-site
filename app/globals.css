@@ -243,6 +243,40 @@ p {
   }
 }
 
+/* Hero photo that melts into the page background.
+   Phones: photo on top, fading out at the bottom.
+   Desktop: photo on the right, fading out on the left and bottom. */
+.hero-photo {
+  mix-blend-mode: lighten; /* photo blacks become the page colour */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 12%,
+    #000 40%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 12%,
+    #000 40%,
+    transparent 92%
+  );
+}
+
+@media (min-width: 1024px) {
+  .hero-photo {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, #000 40%),
+      linear-gradient(to bottom, transparent 0, #000 12%, #000 78%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0, #000 40%),
+      linear-gradient(to bottom, transparent 0, #000 12%, #000 78%, transparent 100%);
+    mask-composite: intersect;
+  }
+}
+
 /* Calm version for visitors who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {

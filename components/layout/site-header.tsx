@@ -66,7 +66,7 @@ export function SiteHeader() {
         </a>
 
         {/* Desktop navigation */}
-        <nav aria-label="Primary" className="hidden md:block">
+        <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-7">
             {navItems.map((item) => {
               const isActive = active === item.href.slice(1);
@@ -95,7 +95,7 @@ export function SiteHeader() {
 
         <a
           href="#contact"
-          className="btn-gold hidden !min-h-10 !px-5 md:inline-flex"
+          className="btn-gold hidden !min-h-10 !px-5 lg:inline-flex"
         >
           Let&apos;s talk
         </a>
@@ -103,7 +103,7 @@ export function SiteHeader() {
         {/* Mobile menu toggle */}
         <button
           type="button"
-          className="glass inline-flex size-11 items-center justify-center rounded-full text-ink md:hidden"
+          className="glass inline-flex size-11 items-center justify-center rounded-full text-ink lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -121,7 +121,7 @@ export function SiteHeader() {
             role="dialog"
             aria-modal="true"
             aria-label={`${siteConfig.name} menu`}
-            className="fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col bg-canvas/95 px-5 pb-10 pt-6 backdrop-blur-2xl md:hidden"
+            className="fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col bg-canvas/95 px-5 pb-10 pt-6 backdrop-blur-2xl lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
