@@ -66,6 +66,18 @@ export interface Service {
   seenIn?: string;
 }
 
+export interface Certification {
+  id: string;
+  title: string;
+  issuer: string;
+  /** Date printed on the certificate, e.g. "3 Nov 2025". */
+  date: string;
+  /** Certificate ID printed on the certificate. */
+  certificateId: string;
+  /** The services this training supports, shown as context. */
+  supports: string;
+}
+
 export interface SkillGroup {
   id: string;
   title: string;
