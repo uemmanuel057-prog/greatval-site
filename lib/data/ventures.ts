@@ -7,25 +7,25 @@ export const ventures: Venture[] = [
     name: "Campus Pulse NG",
     role: "Founder & Lead Creative",
     scope:
-      "Campus media platform covering youth culture and events, including event broadcast logistics.",
+      "A campus-focused media brand showcasing creativity, student lifestyle and campus culture, including event broadcast logistics.",
     category: "Media",
     tags: ["Campus media", "Youth culture", "Event coverage", "CAC registered"],
   },
   {
-    id: "ev-technology-concept",
-    name: "EV Technology Concept",
+    id: "ev-technology-concepts",
+    name: "EV Technology Concepts",
     role: "CEO & Lead Systems Engineer",
     scope:
-      "Solar backup solutions, commercial IP CCTV surveillance networks, and hardware connectivity.",
+      "A technology brand focused on gadgets, solar installations and smart systems, including solar backup, commercial IP CCTV surveillance networks, and hardware connectivity.",
     category: "Technology",
-    tags: ["Solar backup", "IP CCTV", "Connectivity"],
+    tags: ["Gadgets", "Solar backup", "IP CCTV", "Smart systems"],
   },
   {
     id: "model-x-africa",
     name: "Model X Africa",
     role: "Co-Founder & Talent Strategist",
     scope:
-      "Model talent acquisition, event positioning, and digital campaign management.",
+      "A creative and modeling platform that discovers and promotes talent, with talent acquisition, event positioning, and digital campaign management.",
     category: "Talent",
     tags: ["Talent acquisition", "Event positioning", "Digital campaigns"],
   },

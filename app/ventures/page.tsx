@@ -6,7 +6,7 @@ import { PageShell } from "@/components/ui/page-shell";
 export const metadata: Metadata = {
   title: "Ventures",
   description:
-    "Campus Pulse NG, EV Technology Concept, Model X Africa, and Face of FUO Connects, plus client growth support.",
+    "Campus Pulse NG, EV Technology Concepts, Model X Africa, and Face of FUO Connects, plus client growth support.",
 };
 
 export default function VenturesPage() {

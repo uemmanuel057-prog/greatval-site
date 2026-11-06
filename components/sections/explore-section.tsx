@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowUpRight,
+  Briefcase,
   Code,
   Globe,
   Layers,
@@ -21,6 +22,7 @@ const icons: Record<string, LucideIcon> = {
   "/pillars": Layers,
   "/ventures": Rocket,
   "/projects": Globe,
+  "/services": Briefcase,
   "/skills": Code,
   "/featured": Sparkles,
   "/contact": Mail,
@@ -51,7 +53,17 @@ export function ExploreSection() {
           {cards.map((page, i) => {
             const Icon = icons[page.href];
             return (
-              <Reveal as="li" key={page.href} delay={(i % 3) * 0.08}>
+              <Reveal
+                as="li"
+                key={page.href}
+                delay={(i % 3) * 0.08}
+                // An odd last card would leave a hole, so it spans the row.
+                className={
+                  i === cards.length - 1 && cards.length % 3 === 1
+                    ? "sm:col-span-2 lg:col-span-3"
+                    : undefined
+                }
+              >
                 <TiltCard className="card beam h-full !p-0">
                   <Link
                     href={page.href}

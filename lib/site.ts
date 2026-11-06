@@ -30,12 +30,17 @@ export const sitePages: SitePage[] = [
   {
     label: "Ventures",
     href: "/ventures",
-    blurb: "Campus Pulse NG, EV Technology Concept, Model X Africa, and FOFC.",
+    blurb: "Campus Pulse NG, EV Technology Concepts, Model X Africa, and FOFC.",
   },
   {
     label: "Projects",
     href: "/projects",
     blurb: "Live websites built end to end, including this one.",
+  },
+  {
+    label: "Services",
+    href: "/services",
+    blurb: "Web, brand, ads, video, live broadcast, events, and automation.",
   },
   {
     label: "Skills",

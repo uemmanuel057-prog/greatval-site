@@ -51,6 +51,14 @@ export interface WebProject {
   isThisSite?: boolean;
 }
 
+export interface Service {
+  id: string;
+  title: string;
+  description: string;
+  /** Verified work this service shows up in. Only list what is true. */
+  seenIn?: string;
+}
+
 export interface SkillGroup {
   id: string;
   title: string;

@@ -7,7 +7,7 @@ import type { Venture } from "@/lib/types";
 
 const icons: Record<string, LucideIcon> = {
   "campus-pulse-ng": Radio,
-  "ev-technology-concept": Zap,
+  "ev-technology-concepts": Zap,
   "model-x-africa": Users,
   fofc: Clapperboard,
 };
