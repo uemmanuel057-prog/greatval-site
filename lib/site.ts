@@ -35,6 +35,11 @@ export const socialLinks: SocialLink[] = [
     label: "Facebook",
     href: "https://www.facebook.com/share/1FHJH5EgKh/",
   },
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@im_just_val1",
+    handle: "@im_just_val1",
+  },
 ];
 
 /** Every page on the site, in navigation order. */
