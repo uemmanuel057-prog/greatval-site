@@ -1,4 +1,4 @@
-import type { NavItem } from "@/lib/types";
+import type { NavItem, SitePage } from "@/lib/types";
 
 /**
  * Central site configuration.
@@ -15,12 +15,46 @@ export const siteConfig = {
   email: "uemmanuel057@gmail.com",
 } as const;
 
-export const navItems: NavItem[] = [
-  { label: "About", href: "#about" },
-  { label: "Pillars", href: "#pillars" },
-  { label: "Ventures", href: "#ventures" },
-  { label: "Projects", href: "#projects" },
-  { label: "Skills", href: "#skills" },
-  { label: "Featured", href: "#featured" },
-  { label: "Contact", href: "#contact" },
+/** Every page on the site, in navigation order. */
+export const sitePages: SitePage[] = [
+  {
+    label: "About",
+    href: "/about",
+    blurb: "Web development, media, marketing, and entrepreneurship, connected.",
+  },
+  {
+    label: "Pillars",
+    href: "/pillars",
+    blurb: "Four pillars: creator, strategist, entrepreneur, and builder in public.",
+  },
+  {
+    label: "Ventures",
+    href: "/ventures",
+    blurb: "Campus Pulse NG, EV Technology Concept, Model X Africa, and FOFC.",
+  },
+  {
+    label: "Projects",
+    href: "/projects",
+    blurb: "Live websites built end to end, including this one.",
+  },
+  {
+    label: "Skills",
+    href: "/skills",
+    blurb: "Next.js, React, TypeScript, ads, live broadcast, and automation.",
+  },
+  {
+    label: "Featured",
+    href: "/featured",
+    blurb: "The book, the podcast, and match commentary in motion.",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    blurb: "Start a conversation about web, growth, or media.",
+  },
 ];
+
+export const navItems: NavItem[] = sitePages.map(({ label, href }) => ({
+  label,
+  href,
+}));

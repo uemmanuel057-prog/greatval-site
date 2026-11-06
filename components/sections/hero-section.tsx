@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight, Code, Megaphone, Radio, Zap, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { CursorOrb } from "@/components/motion/cursor-orb";
@@ -93,15 +94,15 @@ export function HeroSection() {
 
             <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row">
               <Magnetic>
-                <a href="#ventures" data-beam="always" className="btn-gold">
+                <Link href="/ventures" data-beam="always" className="btn-gold">
                   See the ventures
                   <ArrowRight size={18} aria-hidden="true" />
-                </a>
+                </Link>
               </Magnetic>
               <Magnetic>
-                <a href="#contact" className="btn-glass">
+                <Link href="/contact" className="btn-glass">
                   Get in touch
-                </a>
+                </Link>
               </Magnetic>
             </div>
 

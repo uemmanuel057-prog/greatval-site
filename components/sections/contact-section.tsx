@@ -5,18 +5,22 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { Magnetic } from "@/components/motion/magnetic";
 import { siteConfig } from "@/lib/site";
+import { sectionSpacing } from "@/lib/section-style";
+import type { SectionProps } from "@/lib/types";
 import contactPhoto from "@/public/images/great-val-contact.webp";
 
 /**
  * Contact section.
  * TODO: add confirmed social links here once the user provides them.
  */
-export function ContactSection() {
+export function ContactSection({ page = false }: SectionProps) {
   return (
     <section
       id="contact"
       aria-labelledby="contact-title"
-      className="relative overflow-hidden bg-raised py-20 sm:py-28"
+      className={`relative overflow-hidden ${
+        page ? sectionSpacing(true) : "bg-raised py-20 sm:py-28"
+      }`}
     >
       <div
         aria-hidden="true"
@@ -27,6 +31,8 @@ export function ContactSection() {
           <Reveal>
             <SectionHeading
               id="contact-title"
+              as={page ? "h1" : "h2"}
+              large={page}
               eyebrow="Contact"
               title="Let's build something."
               description="Whether you are a business looking for growth or technology support, or a young creator or entrepreneur learning in public, this is the place to start."

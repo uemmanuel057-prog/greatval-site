@@ -5,6 +5,16 @@ export interface NavItem {
   href: string;
 }
 
+/** A page on the site, used for navigation, home teasers and "next page" links. */
+export interface SitePage extends NavItem {
+  blurb: string;
+}
+
+/** Sections render as a full page when `page` is true. */
+export interface SectionProps {
+  page?: boolean;
+}
+
 export interface Pillar {
   id: string;
   index: string; // "01" – "04"

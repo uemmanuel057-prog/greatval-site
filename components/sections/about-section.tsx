@@ -3,20 +3,24 @@ import { Container } from "@/components/ui/container";
 import { Portrait } from "@/components/ui/portrait";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
+import { sectionSpacing } from "@/lib/section-style";
+import type { SectionProps } from "@/lib/types";
 import aboutPhoto from "@/public/images/great-val-about.webp";
 
-export function AboutSection() {
+export function AboutSection({ page = false }: SectionProps) {
   return (
     <section
       id="about"
       aria-labelledby="about-title"
-      className="border-b border-line py-20 sm:py-28"
+      className={sectionSpacing(page)}
     >
       <Container className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
         <div>
           <Reveal>
             <SectionHeading
               id="about-title"
+              as={page ? "h1" : "h2"}
+              large={page}
               eyebrow="About"
               title="One builder, four disciplines."
             />

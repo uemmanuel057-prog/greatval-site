@@ -4,6 +4,8 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { pillars } from "@/lib/data/pillars";
+import { sectionSpacing } from "@/lib/section-style";
+import type { SectionProps } from "@/lib/types";
 
 const icons: Record<string, LucideIcon> = {
   creator: Radio,
@@ -12,17 +14,19 @@ const icons: Record<string, LucideIcon> = {
   public: BookOpen,
 };
 
-export function PillarsSection() {
+export function PillarsSection({ page = false }: SectionProps) {
   return (
     <section
       id="pillars"
       aria-labelledby="pillars-title"
-      className="border-b border-line bg-raised py-20 sm:py-28"
+      className={sectionSpacing(page, "raised")}
     >
       <Container>
         <Reveal>
           <SectionHeading
             id="pillars-title"
+            as={page ? "h1" : "h2"}
+            large={page}
             eyebrow="Four pillars"
             title="What I do, and how it fits together."
           />

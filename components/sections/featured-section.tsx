@@ -4,7 +4,8 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { featuredAssets } from "@/lib/data/featured";
-import type { FeaturedAsset } from "@/lib/types";
+import { sectionSpacing } from "@/lib/section-style";
+import type { FeaturedAsset, SectionProps } from "@/lib/types";
 
 const statusLabel: Record<FeaturedAsset["status"], string> = {
   "in-progress": "In progress",
@@ -18,17 +19,19 @@ const icons: Record<FeaturedAsset["type"], LucideIcon> = {
   Commentary: Tv,
 };
 
-export function FeaturedSection() {
+export function FeaturedSection({ page = false }: SectionProps) {
   return (
     <section
       id="featured"
       aria-labelledby="featured-title"
-      className="border-b border-line py-20 sm:py-28"
+      className={sectionSpacing(page)}
     >
       <Container>
         <Reveal>
           <SectionHeading
             id="featured-title"
+            as={page ? "h1" : "h2"}
+            large={page}
             eyebrow="Featured"
             title="Books, podcasts & commentary."
             description="Building in public means the work is never finished. Here is what is in motion."

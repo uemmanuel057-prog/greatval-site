@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { navItems, siteConfig } from "@/lib/site";
 
@@ -20,12 +21,12 @@ export function SiteFooter() {
             <ul className="grid grid-cols-2 gap-x-6 gap-y-3">
               {navItems.map((item) => (
                 <li key={item.href}>
-                  <a
+                  <Link
                     href={item.href}
                     className="text-sm text-ink-muted transition-colors hover:text-accent"
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

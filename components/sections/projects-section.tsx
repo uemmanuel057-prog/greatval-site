@@ -4,22 +4,26 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { webProjects } from "@/lib/data/projects";
+import { sectionSpacing } from "@/lib/section-style";
+import type { SectionProps } from "@/lib/types";
 
 function hostOf(url: string): string {
   return new URL(url).host;
 }
 
-export function ProjectsSection() {
+export function ProjectsSection({ page = false }: SectionProps) {
   return (
     <section
       id="projects"
       aria-labelledby="projects-title"
-      className="border-b border-line bg-raised py-20 sm:py-28"
+      className={sectionSpacing(page, "raised")}
     >
       <Container>
         <Reveal>
           <SectionHeading
             id="projects-title"
+            as={page ? "h1" : "h2"}
+            large={page}
             eyebrow="Web projects"
             title="Websites I've built."
             description="Live sites, designed and developed end to end. Open any of them to see the real thing."

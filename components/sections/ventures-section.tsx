@@ -3,18 +3,22 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { VenturesShowcase } from "@/components/sections/ventures-showcase";
 import { clientSupport, ventures } from "@/lib/data/ventures";
+import { sectionSpacing } from "@/lib/section-style";
+import type { SectionProps } from "@/lib/types";
 
-export function VenturesSection() {
+export function VenturesSection({ page = false }: SectionProps) {
   return (
     <section
       id="ventures"
       aria-labelledby="ventures-title"
-      className="border-b border-line py-20 sm:py-28"
+      className={sectionSpacing(page)}
     >
       <Container>
         <Reveal>
           <SectionHeading
             id="ventures-title"
+            as={page ? "h1" : "h2"}
+            large={page}
             eyebrow="Featured ventures"
             title="Where the work happens."
             description="Verified roles across media, technology, talent, and production."

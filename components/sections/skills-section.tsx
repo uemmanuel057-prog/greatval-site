@@ -2,18 +2,22 @@ import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { skillGroups } from "@/lib/data/skills";
+import { sectionSpacing } from "@/lib/section-style";
+import type { SectionProps } from "@/lib/types";
 
-export function SkillsSection() {
+export function SkillsSection({ page = false }: SectionProps) {
   return (
     <section
       id="skills"
       aria-labelledby="skills-title"
-      className="border-b border-line bg-raised py-20 sm:py-28"
+      className={sectionSpacing(page, "raised")}
     >
       <Container>
         <Reveal>
           <SectionHeading
             id="skills-title"
+            as={page ? "h1" : "h2"}
+            large={page}
             eyebrow="Skill stack"
             title="The toolkit."
           />
