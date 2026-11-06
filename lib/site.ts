@@ -10,8 +10,9 @@ export const siteConfig = {
   // TODO: confirm final domain (blueprint says greatval.co).
   url: "https://greatval.co",
   description:
-    "GREAT VAL is a creator, marketer and strategist, entrepreneur, and technology practitioner — building ideas, creating value, and documenting growth in public.",
-  role: "Creator · Marketer & Strategist · Entrepreneur · Technology Practitioner",
+    "GREAT VAL is a web developer, creator, marketer and strategist, and entrepreneur — building ideas, creating value, and documenting growth in public.",
+  role: "Web Developer · Creator · Marketer & Strategist · Entrepreneur",
+  email: "uemmanuel057@gmail.com",
 } as const;
 
 export const navItems: NavItem[] = [
