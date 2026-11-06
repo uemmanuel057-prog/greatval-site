@@ -14,7 +14,7 @@ export const siteConfig = {
   role: "Web Developer · Creator · Marketer & Strategist · Entrepreneur",
   email: "uemmanuel057@gmail.com",
   /** WhatsApp number in international format, digits only (no + or spaces). */
-  whatsapp: "2348105196360",
+  whatsapp: "2348105186360",
   whatsappMessage:
     "Hi GREAT VAL, I found you through your website and I'd like to talk about a project. Here is what I need: ",
 } as const;
