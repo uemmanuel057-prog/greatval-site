@@ -1,4 +1,4 @@
-import { BookOpen, Cpu, Megaphone, Radio, type LucideIcon } from "lucide-react";
+import { pillarIcons as icons } from "@/lib/pillar-icons";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
@@ -6,13 +6,6 @@ import { TiltCard } from "@/components/motion/tilt-card";
 import { pillars } from "@/lib/data/pillars";
 import { sectionSpacing } from "@/lib/section-style";
 import type { SectionProps } from "@/lib/types";
-
-const icons: Record<string, LucideIcon> = {
-  creator: Radio,
-  marketing: Megaphone,
-  tech: Cpu,
-  public: BookOpen,
-};
 
 export function PillarsSection({ page = false }: SectionProps) {
   return (

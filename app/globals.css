@@ -291,3 +291,43 @@ p {
     animation: none;
   }
 }
+
+/* Slow ring rotation behind the home story */
+@keyframes spin-slow {
+  to {
+    rotate: 360deg;
+  }
+}
+.spin-slow {
+  animation: spin-slow 70s linear infinite;
+}
+
+/* Seamless marquee: track holds two copies, so -50% loops exactly */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 55s linear infinite;
+}
+.marquee-reverse {
+  animation-direction: reverse;
+  animation-duration: 65s;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin-slow,
+  .marquee-track {
+    animation: none;
+  }
+  .marquee {
+    overflow-x: auto;
+  }
+}
