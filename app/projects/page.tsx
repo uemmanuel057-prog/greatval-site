@@ -6,7 +6,7 @@ import { PageShell } from "@/components/ui/page-shell";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Live websites designed and developed by GREAT VAL, including Prosper Shots and Model X Africa.",
+    "Websites and apps designed and developed by GREAT VAL, including Prosper Shots, Model X Africa and the PulseLog Android beta.",
 };
 
 export default function ProjectsPage() {

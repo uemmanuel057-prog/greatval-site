@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Download } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
@@ -24,9 +24,9 @@ export function ProjectsSection({ page = false }: SectionProps) {
             id="projects-title"
             as={page ? "h1" : "h2"}
             large={page}
-            eyebrow="Web projects"
-            title="Websites I've built."
-            description="Live sites, designed and developed end to end. Open any of them to see the real thing."
+            eyebrow="Projects"
+            title="Websites & apps I've built."
+            description="Live sites and apps in progress, designed and developed end to end. Open any of them to see the real thing."
           />
         </Reveal>
 
@@ -40,16 +40,16 @@ export function ProjectsSection({ page = false }: SectionProps) {
                   <span className="size-2.5 rounded-full bg-white/15" />
                   <span className="size-2.5 rounded-full bg-accent/70" />
                   <span className="ml-3 truncate rounded-md bg-black/30 px-3 py-1 font-mono text-xs text-code">
-                    {hostOf(project.url)}
+                    {project.platformLabel ?? hostOf(project.url)}
                   </span>
                 </div>
 
                 <div className="flex flex-1 flex-col p-6 sm:p-7">
                   <div className="flex items-center justify-between gap-3">
                     <p className="eyebrow">{project.category}</p>
-                    {project.isThisSite ? (
+                    {project.isThisSite || project.status === "in-progress" ? (
                       <span className="shrink-0 whitespace-nowrap rounded-full border border-accent/40 px-2.5 py-0.5 font-mono text-xs text-accent">
-                        This site
+                        {project.isThisSite ? "This site" : "In progress"}
                       </span>
                     ) : null}
                   </div>
@@ -67,16 +67,29 @@ export function ProjectsSection({ page = false }: SectionProps) {
                     ))}
                   </ul>
 
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-glass mt-7 self-start"
-                  >
-                    Visit site
-                    <ArrowUpRight size={18} aria-hidden="true" />
-                    <span className="sr-only"> (opens {project.name} in a new tab)</span>
-                  </a>
+                  {project.kind === "app" ? (
+                    <div className="mt-7 flex flex-col items-start gap-2">
+                      <a href={project.url} className="btn-glass">
+                        {project.action?.label ?? "Download"}
+                        <Download size={18} aria-hidden="true" />
+                        <span className="sr-only"> (downloads the {project.name} Android app)</span>
+                      </a>
+                      {project.action?.note ? (
+                        <p className="font-mono text-xs text-ink-muted">{project.action.note}</p>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-glass mt-7 self-start"
+                    >
+                      {project.action?.label ?? "Visit site"}
+                      <ArrowUpRight size={18} aria-hidden="true" />
+                      <span className="sr-only"> (opens {project.name} in a new tab)</span>
+                    </a>
+                  )}
                 </div>
               </TiltCard>
             </Reveal>

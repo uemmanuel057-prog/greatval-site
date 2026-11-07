@@ -25,6 +25,7 @@ const makingRow: Chip[] = [
   })),
   ...webProjects
     .filter((p) => !p.isThisSite)
+    .filter((p) => p.kind !== "app")
     .map((p) => ({ kind: "Website", label: p.name, note: "Live" })),
   { kind: "Website", label: "GREAT VAL", note: "You are here" },
 ];

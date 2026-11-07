@@ -33,6 +33,19 @@ export const webProjects: WebProject[] = [
     ],
   },
   {
+    id: "pulselog",
+    name: "PulseLog",
+    category: "Mobile app · Productivity",
+    description:
+      "A daily execution tracker for creators, builders and entrepreneurs: set goals, check in daily, and watch consistency compound.",
+    url: "https://github.com/uemmanuel057-prog/greatval-site/releases/download/pulselog-v1.0.0-beta/PulseLog-1.0.0-beta.apk",
+    highlights: ["React Native", "Expo", "Daily check-ins", "Weekly targets"],
+    kind: "app",
+    status: "in-progress",
+    platformLabel: "Android · Beta 1.0.0",
+    action: { label: "Test beta version", note: "Android only · 116 MB download" },
+  },
+  {
     id: "great-val",
     name: "GREAT VAL",
     category: "Personal brand & portfolio",

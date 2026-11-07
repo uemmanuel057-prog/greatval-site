@@ -56,6 +56,14 @@ export interface WebProject {
   highlights: string[];
   /** True for the portfolio site itself. */
   isThisSite?: boolean;
+  /** Defaults to "website". Apps show a platform label instead of a host. */
+  kind?: "website" | "app";
+  /** Defaults to "live". */
+  status?: "live" | "in-progress";
+  /** Shown in the card's top bar for apps, e.g. "Android · Beta". */
+  platformLabel?: string;
+  /** Overrides the default "Visit site" button. */
+  action?: { label: string; note?: string };
 }
 
 export interface Service {
