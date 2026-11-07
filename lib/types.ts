@@ -88,7 +88,7 @@ export type AssetStatus = "in-progress" | "coming-soon";
 
 export interface FeaturedAsset {
   id: string;
-  type: "Book" | "Podcast" | "Commentary";
+  type: "Book" | "Podcast" | "Commentary" | "App";
   title: string;
   subtitle?: string;
   description: string;

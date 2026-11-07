@@ -15,6 +15,15 @@ export const featuredAssets: FeaturedAsset[] = [
     status: "in-progress",
   },
   {
+    id: "pulselog",
+    type: "App",
+    title: "PulseLog",
+    subtitle: "Android beta in progress",
+    description:
+      "A daily execution tracker for creators, builders and entrepreneurs: set goals, check in daily, and watch consistency compound.",
+    status: "in-progress",
+  },
+  {
     id: "podcast",
     type: "Podcast",
     title: "One Brick at a Time",

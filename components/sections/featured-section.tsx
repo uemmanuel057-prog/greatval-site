@@ -1,4 +1,4 @@
-import { BookOpen, Mic, Tv, type LucideIcon } from "lucide-react";
+import { BookOpen, Mic, Smartphone, Tv, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/motion/reveal";
@@ -17,6 +17,7 @@ const icons: Record<FeaturedAsset["type"], LucideIcon> = {
   Book: BookOpen,
   Podcast: Mic,
   Commentary: Tv,
+  App: Smartphone,
 };
 
 export function FeaturedSection({ page = false }: SectionProps) {
@@ -33,11 +34,11 @@ export function FeaturedSection({ page = false }: SectionProps) {
             as={page ? "h1" : "h2"}
             large={page}
             eyebrow="Featured"
-            title="Books, podcasts & commentary."
+            title="Books, podcasts, apps & commentary."
             description="Building in public means the work is never finished. Here is what is in motion."
           />
         </Reveal>
-        <ul className="grid gap-5 md:grid-cols-3">
+        <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {featuredAssets.map((asset, i) => {
             const Icon = icons[asset.type];
             return (
