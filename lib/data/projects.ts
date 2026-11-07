@@ -38,7 +38,7 @@ export const webProjects: WebProject[] = [
     category: "Mobile app · Productivity",
     description:
       "A daily execution tracker for creators, builders and entrepreneurs: set goals, check in daily, and watch consistency compound.",
-    url: "https://github.com/uemmanuel057-prog/greatval-site/releases/download/pulselog-v1.0.0-beta/PulseLog-1.0.0-beta.apk",
+    url: "https://github.com/uemmanuel057-prog/greatval-site/releases/download/pulselog-v1.0.0-beta/application-6aeecf4d-4669-4d04-925f-26b9249f82c1.apk",
     highlights: ["React Native", "Expo", "Daily check-ins", "Weekly targets"],
     kind: "app",
     status: "in-progress",
