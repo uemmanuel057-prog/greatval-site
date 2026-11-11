@@ -192,6 +192,51 @@ p {
     border-color: rgb(229 169 60 / 0.5);
   }
 
+  /* Studio sliders: a thin track and a gold thumb that is easy to grab on a phone. */
+  .studio-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 1.5rem;
+    background: transparent;
+    cursor: pointer;
+  }
+  .studio-range:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .studio-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.14);
+  }
+  .studio-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-top: -8px;
+    border-radius: 999px;
+    background: #e5a93c;
+    border: 2px solid #0b0f17;
+    box-shadow: 0 0 0 1px rgb(229 169 60 / 0.6);
+  }
+  .studio-range::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.14);
+  }
+  .studio-range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: #e5a93c;
+    border: 2px solid #0b0f17;
+    box-shadow: 0 0 0 1px rgb(229 169 60 / 0.6);
+  }
+  .studio-range:focus-visible {
+    outline: 2px solid #e5a93c;
+    outline-offset: 2px;
+  }
+
   .float-a {
     animation: float-y 6s ease-in-out infinite;
   }
