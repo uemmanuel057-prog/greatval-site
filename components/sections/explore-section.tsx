@@ -8,6 +8,7 @@ import {
   Mail,
   Rocket,
   Sparkles,
+  Wrench,
   User,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const icons: Record<string, LucideIcon> = {
   "/services": Briefcase,
   "/skills": Code,
   "/featured": Sparkles,
+  "/tools": Wrench,
   "/contact": Mail,
 };
 
