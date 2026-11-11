@@ -25,7 +25,7 @@ export const webProjects: WebProject[] = [
     category: "Talent agency",
     description:
       "Website for a pan-African talent management agency, built around its roster and talent applications.",
-    url: "https://model-x-africa.vercel.app",
+    url: "https://www.modelxafrica.com",
     highlights: [
       "Talent roster",
       "Face of Bayelsa Universities competition",
