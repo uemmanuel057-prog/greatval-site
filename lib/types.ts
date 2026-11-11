@@ -104,3 +104,11 @@ export interface FeaturedAsset {
   /** Only set when a real, confirmed URL exists. Never invent one. */
   href?: string;
 }
+
+export interface Tool {
+  id: string;
+  title: string;
+  description: string;
+  href: string;
+  status: "Live" | "Coming soon";
+}
