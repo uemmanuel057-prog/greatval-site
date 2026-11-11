@@ -87,6 +87,11 @@ export const sitePages: SitePage[] = [
     blurb: "The book, the podcast, and match commentary in motion.",
   },
   {
+    label: "Tools",
+    href: "/tools",
+    blurb: "Free creativity tools anyone can use, starting with a video editor.",
+  },
+  {
     label: "Contact",
     href: "/contact",
     blurb: "Start a conversation about web, growth, or media.",
