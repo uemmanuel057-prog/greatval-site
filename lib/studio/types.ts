@@ -60,7 +60,7 @@ export interface Mask {
 }
 export const noMask: Mask = { shape: "none", size: 0.7, invert: false };
 
-export type TransitionType = "none" | "fade" | "wipe" | "zoom" | "slide";
+export type TransitionType = "none" | "fade" | "wipe" | "zoom" | "slide" | "slideUp" | "wipeDown" | "spin" | "flash" | "shake";
 export interface Transition {
   type: TransitionType;
   duration: number; // seconds, split across the end of the previous clip and the start of this one
@@ -166,7 +166,7 @@ export interface OverlayLayer {
 }
 
 export type AudioKind = "music" | "sfx";
-export type SfxName = "whoosh" | "pop" | "boom" | "shutter";
+export type SfxName = "whoosh" | "pop" | "boom" | "shutter" | "ding" | "click" | "riser" | "hit" | "glitch" | "sparkle" | "swipe";
 export interface AudioItem {
   id: string;
   kind: AudioKind;
@@ -183,7 +183,7 @@ export interface CaptionWord {
   start: number;
   end: number;
 }
-export type CaptionStyle = "gold" | "box" | "serif";
+export type CaptionStyle = "gold" | "box" | "serif" | "pop" | "karaoke" | "bounce" | "typewriter" | "neon" | "slide" | "wave";
 
 export type BackgroundKind = "color" | "glow" | "blur" | "image";
 export interface Background {
@@ -213,6 +213,8 @@ export interface Project {
   captionStyle: CaptionStyle;
   /** Sound effect played at the start of every caption line. */
   captionSfx: SfxName | "none";
+  /** Sound played at each cut that has a transition. */
+  transitionSfx: SfxName | "none";
   beats: number[];
   background: Background;
   mix: Mix;
@@ -278,6 +280,7 @@ export const initialProject: Project = {
   captions: [],
   captionStyle: "gold",
   captionSfx: "none",
+  transitionSfx: "none",
   beats: [],
   background: { kind: "glow", color: "#0B0F17" },
   mix: { main: 1, music: 0.8, sfx: 1 },

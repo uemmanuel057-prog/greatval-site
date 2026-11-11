@@ -136,6 +136,11 @@ export class StudioEngine {
       ...(project.captionSfx !== "none"
         ? captionLines(project.captions).map((l) => ({ t: l[0].start, name: project.captionSfx as SfxName }))
         : []),
+      ...(project.transitionSfx !== "none"
+        ? layout(project.clips)
+            .filter((item, i) => i > 0 && item.clip.transition.type !== "none")
+            .map((item) => ({ t: Math.max(0, item.start - item.clip.transition.duration / 2), name: project.transitionSfx as SfxName }))
+        : []),
     ].sort((a, b) => a.t - b.t);
     this.requestDraw();
   }
@@ -737,6 +742,18 @@ export class StudioEngine {
       t.scale = 1 + (1 - vis) * 0.3;
     } else if (type === "wipe") t.wipe = vis;
     else if (type === "slide") t.dx = (out ? -1 : 1) * (1 - vis);
+    else if (type === "slideUp") t.dy = (out ? -1 : 1) * (1 - vis);
+    else if (type === "wipeDown") t.wipeV = vis;
+    else if (type === "spin") {
+      t.alpha = vis;
+      t.scale = 0.6 + 0.4 * vis;
+      t.rot = (out ? -1 : 1) * (1 - vis) * 0.6;
+    } else if (type === "flash") t.flash = 1 - vis;
+    else if (type === "shake") {
+      t.dx = Math.sin(local * 70) * 0.035 * (1 - vis);
+      t.dy = Math.cos(local * 53) * 0.02 * (1 - vis);
+      t.alpha = 0.5 + 0.5 * vis;
+    }
     return t;
   }
 

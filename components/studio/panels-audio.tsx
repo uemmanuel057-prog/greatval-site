@@ -20,6 +20,13 @@ const sfxList: { id: SfxName; label: string }[] = [
   { id: "pop", label: "Pop" },
   { id: "boom", label: "Boom" },
   { id: "shutter", label: "Shutter" },
+  { id: "ding", label: "Ding" },
+  { id: "click", label: "Click" },
+  { id: "riser", label: "Riser" },
+  { id: "hit", label: "Hit" },
+  { id: "glitch", label: "Glitch" },
+  { id: "sparkle", label: "Sparkle" },
+  { id: "swipe", label: "Swipe" },
 ];
 
 export function AudioPanel({

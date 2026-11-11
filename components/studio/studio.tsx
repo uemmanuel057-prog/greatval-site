@@ -11,6 +11,7 @@ import { initialProject, newClip, type QualityId, type Selection, type Source, t
 import { AudioPanel } from "./panels-audio";
 import { CanvasPanel, OverlayPanel, TextPanel } from "./panels-create";
 import { EditPanel, LookPanel, MotionPanel, NoClip } from "./panels-edit";
+import { InstallApp } from "./install-app";
 import { Timeline } from "./timeline";
 import { Empty, Note, type PanelProps, type TaskRunner } from "./ui";
 import { useEngineValue } from "./use-engine-value";
@@ -379,6 +380,7 @@ export function Studio() {
         <p className="mt-2 max-w-2xl text-sm text-ink-muted sm:text-base">
           Edit short videos for Reels, TikTok and YouTube. Everything happens on your device, and your videos are never uploaded.
         </p>
+        <InstallApp />
 
         <input
           ref={fileInput}

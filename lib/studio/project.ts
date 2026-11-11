@@ -178,6 +178,7 @@ export type Action =
   | { type: "setCaptions"; words: CaptionWord[] }
   | { type: "setCaptionStyle"; style: CaptionStyle }
   | { type: "setCaptionSfx"; sfx: SfxName | "none" }
+  | { type: "setTransitionSfx"; sfx: SfxName | "none" }
   | { type: "setBeats"; beats: number[] }
   | { type: "setBackground"; background: Background }
   | { type: "setMix"; mix: Mix }
@@ -302,6 +303,8 @@ export function reduceProject(p: Project, a: Action): Project {
       return { ...p, captionStyle: a.style };
     case "setCaptionSfx":
       return { ...p, captionSfx: a.sfx };
+    case "setTransitionSfx":
+      return { ...p, transitionSfx: a.sfx };
     case "setBeats":
       return { ...p, beats: a.beats };
     case "setBackground":

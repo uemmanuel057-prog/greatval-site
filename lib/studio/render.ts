@@ -23,10 +23,10 @@ export interface LayerDraw {
   shift: { x: number; y: number };
   /** Width as a fraction of the canvas. Used by overlays instead of fit. */
   widthFrac?: number;
-  trans: { alpha: number; scale: number; wipe: number; dx: number };
+  trans: { alpha: number; scale: number; wipe: number; dx: number; dy: number; wipeV: number; rot: number; flash: number };
 }
 
-export const noTrans = { alpha: 1, scale: 1, wipe: 1, dx: 0 };
+export const noTrans = { alpha: 1, scale: 1, wipe: 1, dx: 0, dy: 0, wipeV: 1, rot: 0, flash: 0 };
 
 interface Geometry {
   cx: number;
@@ -52,11 +52,11 @@ export function layerGeometry(L: LayerDraw, W: number, H: number): Geometry {
   const panY = -L.crop.y * H * ((L.crop.zoom - 1) / 2);
   return {
     cx: W / 2 + panX + (L.tf.x + L.shift.x) * W + L.trans.dx * W,
-    cy: H / 2 + panY + (L.tf.y + L.shift.y) * H,
+    cy: H / 2 + panY + (L.tf.y + L.shift.y) * H + L.trans.dy * H,
     dw,
     dh,
     scale: L.tf.scale * L.trans.scale,
-    rot: (L.tf.rotation * Math.PI) / 180,
+    rot: (L.tf.rotation * Math.PI) / 180 + L.trans.rot,
   };
 }
 
@@ -126,6 +126,11 @@ export function paintLayer(ctx: CanvasRenderingContext2D, L: LayerDraw, W: numbe
     ctx.rect(0, 0, W * L.trans.wipe, H);
     ctx.clip();
   }
+  if (L.trans.wipeV < 1) {
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H * L.trans.wipeV);
+    ctx.clip();
+  }
   ctx.globalAlpha = alpha;
   ctx.translate(g.cx, g.cy);
   ctx.rotate(g.rot);
@@ -138,6 +143,12 @@ export function paintLayer(ctx: CanvasRenderingContext2D, L: LayerDraw, W: numbe
   if (f !== "none" && supportsFilter(ctx)) ctx.filter = f;
   ctx.drawImage(L.el, -g.dw / 2, -g.dh / 2, g.dw, g.dh);
   ctx.filter = "none";
+  if (L.trans.flash > 0) {
+    ctx.globalAlpha = alpha * Math.min(L.trans.flash, 1);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(-g.dw / 2, -g.dh / 2, g.dw, g.dh);
+    ctx.globalAlpha = alpha;
+  }
   if (L.adjust.vignette > 0) {
     const r = Math.hypot(g.dw, g.dh) / 2;
     const grad = ctx.createRadialGradient(0, 0, r * 0.35, 0, 0, r);
@@ -262,51 +273,138 @@ export function captionLines(words: CaptionWord[], maxWords = 4): CaptionWord[][
   return lines;
 }
 
+type CaptionAnim = "none" | "pop" | "bounce" | "typewriter" | "slide" | "wave" | "fade";
+interface CaptionTemplate {
+  font: "sans" | "serif" | "mono";
+  italic?: boolean;
+  weight: number;
+  size: number; // fraction of the short side
+  upper: boolean;
+  y: number; // fraction of the height
+  fill: string;
+  active: string;
+  /** Opacity of words that are not being spoken. */
+  dim: number;
+  stroke: boolean;
+  glow?: string;
+  /** Dark bar behind the whole line. */
+  bar?: boolean;
+  /** Highlight block behind the spoken word. */
+  block?: boolean;
+  anim: CaptionAnim;
+  /** Words appear as they are spoken. */
+  reveal?: boolean;
+  /** The spoken word grows slightly. */
+  grow?: boolean;
+}
+
+const captionTemplates: Record<CaptionStyle, CaptionTemplate> = {
+  gold: { font: "sans", weight: 800, size: 0.07, upper: true, y: 0.7, fill: "#FFFFFF", active: BRAND.gold, dim: 1, stroke: true, anim: "none" },
+  box: { font: "sans", weight: 800, size: 0.07, upper: true, y: 0.7, fill: "#FFFFFF", active: BRAND.canvas, dim: 1, stroke: false, bar: true, block: true, anim: "none" },
+  serif: { font: "serif", italic: true, weight: 600, size: 0.05, upper: false, y: 0.84, fill: "#FFFFFF", active: "#FFFFFF", dim: 1, stroke: false, glow: "rgba(0,0,0,0.7)", anim: "none" },
+  pop: { font: "sans", weight: 900, size: 0.075, upper: true, y: 0.68, fill: "#FFFFFF", active: BRAND.gold, dim: 1, stroke: true, anim: "pop", reveal: true },
+  karaoke: { font: "sans", weight: 800, size: 0.066, upper: true, y: 0.7, fill: "#FFFFFF", active: BRAND.gold, dim: 0.5, stroke: true, anim: "fade", grow: true },
+  bounce: { font: "sans", weight: 900, size: 0.075, upper: true, y: 0.68, fill: "#FFFFFF", active: BRAND.cyan, dim: 1, stroke: true, anim: "bounce", reveal: true },
+  typewriter: { font: "mono", weight: 700, size: 0.055, upper: false, y: 0.8, fill: "#F8FAFC", active: BRAND.gold, dim: 1, stroke: false, bar: true, anim: "typewriter", reveal: true },
+  neon: { font: "sans", weight: 800, size: 0.068, upper: true, y: 0.7, fill: "#E0F9FF", active: "#FFFFFF", dim: 0.75, stroke: false, glow: BRAND.cyan, anim: "fade" },
+  slide: { font: "sans", weight: 800, size: 0.065, upper: false, y: 0.72, fill: "#FFFFFF", active: BRAND.gold, dim: 1, stroke: true, anim: "slide" },
+  wave: { font: "sans", weight: 800, size: 0.068, upper: true, y: 0.7, fill: "#FFFFFF", active: BRAND.gold, dim: 1, stroke: true, anim: "wave" },
+};
+
+const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1);
+const easeOutBack = (v: number) => {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(v - 1, 3) + c1 * Math.pow(v - 1, 2);
+};
+
 function drawCaption(ctx: CanvasRenderingContext2D, line: CaptionWord[], t: number, style: CaptionStyle, w: number, h: number, short: number) {
-  const serif = style === "serif";
-  const size = Math.round(short * (serif ? 0.05 : 0.07));
-  ctx.font = serif ? `italic 600 ${size}px ${SERIF}` : `800 ${size}px ${FONT}`;
+  const tp = captionTemplates[style];
+  const size = Math.round(short * tp.size);
+  const family = tp.font === "serif" ? SERIF : tp.font === "mono" ? MONO : FONT;
+  ctx.font = `${tp.italic ? "italic " : ""}${tp.weight} ${size}px ${family}`;
   ctx.textBaseline = "middle";
-  ctx.textAlign = "left";
-  const words = line.map((x) => (serif ? x.text : x.text.toUpperCase()));
+  ctx.textAlign = "center";
+  ctx.lineJoin = "round";
+  const words = line.map((x) => (tp.upper ? x.text.toUpperCase() : x.text));
   const space = ctx.measureText(" ").width;
   const widths = words.map((x) => ctx.measureText(x).width);
   const total = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
-  const y = h * (serif ? 0.84 : 0.7);
-  let x = (w - total) / 2;
-  if (style === "box") {
+
+  const lineAge = clamp01((t - line[0].start) / 0.2);
+  let lineAlpha = 1;
+  let lineDy = 0;
+  if (tp.anim === "fade") lineAlpha = lineAge;
+  if (tp.anim === "slide") {
+    lineAlpha = lineAge;
+    lineDy = (1 - easeOutBack(lineAge)) * size * 0.9;
+  }
+  const y = h * tp.y + lineDy;
+  const left = (w - total) / 2;
+
+  ctx.save();
+  ctx.globalAlpha = lineAlpha;
+  if (tp.bar) {
     const padX = size * 0.5;
-    ctx.fillStyle = "rgba(0,0,0,0.88)";
+    ctx.fillStyle = "rgba(0,0,0,0.86)";
     ctx.beginPath();
-    ctx.roundRect(x - padX, y - size * 0.85, total + padX * 2, size * 1.7, size * 0.35);
+    ctx.roundRect(left - padX, y - size * 0.85, total + padX * 2, size * 1.7, size * 0.35);
     ctx.fill();
   }
-  ctx.lineJoin = "round";
+
+  let x = left;
   words.forEach((word, i) => {
-    const active = t >= line[i].start && t < line[i].end;
-    if (style === "box" && active) {
+    const wd = line[i];
+    const active = t >= wd.start && t < wd.end;
+    const age = clamp01((t - wd.start) / 0.2);
+    const shown = !tp.reveal || t >= wd.start;
+    const cx = x + widths[i] / 2;
+    x += widths[i] + space;
+    if (!shown) return;
+
+    let text = word;
+    let scale = 1;
+    let dy = 0;
+    let alpha = active || tp.dim === 1 ? 1 : tp.dim;
+    if (tp.anim === "pop") scale = 0.5 + 0.5 * easeOutBack(age);
+    if (tp.anim === "bounce") dy = (1 - easeOutBack(age)) * size * 1.1;
+    if (tp.anim === "wave") dy = Math.sin(t * 9 + i * 1.1) * size * 0.09;
+    if (tp.anim === "typewriter") {
+      const reach = clamp01((t - wd.start) / Math.max(0.08, Math.min(0.3, wd.end - wd.start)));
+      text = word.slice(0, Math.max(1, Math.ceil(word.length * reach)));
+    }
+    if (tp.grow && active) scale *= 1.1;
+    if (tp.reveal) alpha *= Math.min(1, age * 3);
+
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.translate(cx, y + dy);
+    ctx.scale(scale, scale);
+    if (tp.block && active) {
       ctx.fillStyle = BRAND.gold;
       ctx.beginPath();
-      ctx.roundRect(x - size * 0.12, y - size * 0.62, widths[i] + size * 0.24, size * 1.24, size * 0.2);
+      ctx.roundRect(-widths[i] / 2 - size * 0.12, -size * 0.62, widths[i] + size * 0.24, size * 1.24, size * 0.2);
       ctx.fill();
     }
-    if (style === "serif") {
-      ctx.shadowColor = "rgba(0,0,0,0.7)";
-      ctx.shadowBlur = size * 0.3;
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fillText(word, x, y);
-      ctx.shadowBlur = 0;
-    } else {
-      if (style === "gold") {
-        ctx.lineWidth = Math.max(4, size * 0.18);
-        ctx.strokeStyle = "rgba(0,0,0,0.75)";
-        ctx.strokeText(word, x, y);
-      }
-      ctx.fillStyle = style === "box" ? (active ? BRAND.canvas : "#FFFFFF") : active ? BRAND.gold : "#FFFFFF";
-      ctx.fillText(word, x, y);
+    if (tp.stroke) {
+      ctx.lineWidth = Math.max(4, size * 0.18);
+      ctx.strokeStyle = "rgba(0,0,0,0.78)";
+      ctx.strokeText(text, tp.anim === "typewriter" ? (-widths[i] + ctx.measureText(text).width) / 2 : 0, 0);
     }
-    x += widths[i] + space;
+    if (tp.glow) {
+      ctx.shadowColor = tp.glow;
+      ctx.shadowBlur = size * (style === "neon" ? (active ? 0.9 : 0.5) : 0.3);
+    }
+    ctx.fillStyle = active ? tp.active : tp.fill;
+    // Typewriter text is drawn from the left edge of its slot so letters do not slide.
+    if (tp.anim === "typewriter") {
+      ctx.textAlign = "left";
+      ctx.fillText(text, -widths[i] / 2, 0);
+    } else ctx.fillText(text, 0, 0);
+    ctx.restore();
   });
+  ctx.restore();
 }
 
 // ---- the whole frame ----

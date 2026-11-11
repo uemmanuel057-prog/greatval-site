@@ -31,6 +31,13 @@ const captionStyles: { id: CaptionStyle; label: string }[] = [
   { id: "gold", label: "GREAT VAL Gold" },
   { id: "box", label: "Box" },
   { id: "serif", label: "Serif" },
+  { id: "pop", label: "Pop in" },
+  { id: "karaoke", label: "Karaoke" },
+  { id: "bounce", label: "Bounce" },
+  { id: "typewriter", label: "Typewriter" },
+  { id: "neon", label: "Neon glow" },
+  { id: "slide", label: "Slide up" },
+  { id: "wave", label: "Wave" },
 ];
 const sfxChoices: { id: SfxName | "none"; label: string }[] = [
   { id: "none", label: "None" },
@@ -38,6 +45,10 @@ const sfxChoices: { id: SfxName | "none"; label: string }[] = [
   { id: "pop", label: "Pop" },
   { id: "boom", label: "Boom" },
   { id: "shutter", label: "Shutter" },
+  { id: "ding", label: "Ding" },
+  { id: "click", label: "Click" },
+  { id: "sparkle", label: "Sparkle" },
+  { id: "swipe", label: "Swipe" },
 ];
 
 export function TextPanel({

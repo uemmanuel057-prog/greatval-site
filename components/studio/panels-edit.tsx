@@ -16,6 +16,7 @@ import {
   type MaskShape,
   type SpeedCurve,
   type Transform,
+  type SfxName,
   type TransitionType,
 } from "@/lib/studio/types";
 import type { StudioEngine } from "@/lib/studio/engine";
@@ -398,6 +399,19 @@ const transitions: { id: TransitionType; label: string }[] = [
   { id: "wipe", label: "Wipe" },
   { id: "zoom", label: "Zoom" },
   { id: "slide", label: "Slide" },
+  { id: "slideUp", label: "Rise" },
+  { id: "wipeDown", label: "Drop wipe" },
+  { id: "spin", label: "Spin" },
+  { id: "flash", label: "Flash" },
+  { id: "shake", label: "Shake" },
+];
+const cutSounds: { id: SfxName | "none"; label: string }[] = [
+  { id: "none", label: "None" },
+  { id: "whoosh", label: "Whoosh" },
+  { id: "swipe", label: "Swipe" },
+  { id: "hit", label: "Hit" },
+  { id: "glitch", label: "Glitch" },
+  { id: "pop", label: "Pop" },
 ];
 
 export function MotionPanel({ clip, index, project, dispatch, engine }: ClipProps) {
@@ -411,6 +425,13 @@ export function MotionPanel({ clip, index, project, dispatch, engine }: ClipProp
           {transitions.map((t) => (
             <Pill key={t.id} active={clip.transition.type === t.id} disabled={index === 0 && t.id !== "none"} onClick={() => patch({ transition: { ...clip.transition, type: t.id } })}>
               {t.label}
+            </Pill>
+          ))}
+        </PillRow>
+        <PillRow label="Sound on every transition">
+          {cutSounds.map((s) => (
+            <Pill key={s.id} active={project.transitionSfx === s.id} onClick={() => dispatch({ type: "setTransitionSfx", sfx: s.id })}>
+              {s.id === "none" ? "No sound" : s.label}
             </Pill>
           ))}
         </PillRow>

@@ -228,6 +228,85 @@ export function playSfx(ctx: AudioContext, dest: AudioNode, name: SfxName, when 
     n.connect(lp);
     lp.connect(env(0.6, 0.003, 0.25));
     n.start(when);
+  } else if (name === "ding" || name === "sparkle" || name === "click" || name === "glitch") {
+    const blip = (freq: number, type: OscillatorType, offset: number, length: number, peak: number, endFreq = freq) => {
+      const o = ctx.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, when + offset);
+      if (endFreq !== freq) o.frequency.exponentialRampToValueAtTime(endFreq, when + offset + length);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, when + offset);
+      g.gain.linearRampToValueAtTime(peak, when + offset + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, when + offset + length);
+      o.connect(g);
+      g.connect(dest);
+      o.start(when + offset);
+      o.stop(when + offset + length + 0.05);
+    };
+    if (name === "ding") {
+      blip(1318, "sine", 0, 1.1, 0.7);
+      blip(1975, "sine", 0, 0.7, 0.3);
+      blip(2637, "sine", 0, 0.4, 0.15);
+    } else if (name === "sparkle") {
+      [3520, 4186, 3136, 4699, 5274].forEach((f, i) => blip(f, "sine", i * 0.055, 0.28, 0.32, f * 0.85));
+    } else if (name === "click") {
+      blip(1900, "square", 0, 0.025, 0.35, 900);
+      const n = noise(ctx, 0.02);
+      const hp = ctx.createBiquadFilter();
+      hp.type = "highpass";
+      hp.frequency.value = 2500;
+      n.connect(hp);
+      hp.connect(env(0.5, 0.002, 0.02));
+      n.start(when);
+    } else {
+      [260, 1700, 540, 2300, 330, 1100, 3000].forEach((f, i) => blip(f, "square", i * 0.045, 0.04, 0.22, f * 0.6));
+    }
+  } else if (name === "riser") {
+    const n = noise(ctx, 1.3);
+    const f = ctx.createBiquadFilter();
+    f.type = "bandpass";
+    f.Q.value = 2;
+    f.frequency.setValueAtTime(300, when);
+    f.frequency.exponentialRampToValueAtTime(6500, when + 1.2);
+    n.connect(f);
+    f.connect(env(0.8, 1.15, 1.25));
+    n.start(when);
+    const o = ctx.createOscillator();
+    o.type = "sawtooth";
+    o.frequency.setValueAtTime(110, when);
+    o.frequency.exponentialRampToValueAtTime(880, when + 1.2);
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 1400;
+    o.connect(lp);
+    lp.connect(env(0.25, 1.15, 1.25));
+    o.start(when);
+    o.stop(when + 1.3);
+  } else if (name === "hit") {
+    const o = ctx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(150, when);
+    o.frequency.exponentialRampToValueAtTime(45, when + 0.25);
+    o.connect(env(1, 0.003, 0.4));
+    o.start(when);
+    o.stop(when + 0.5);
+    const n = noise(ctx, 0.2);
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 2200;
+    n.connect(lp);
+    lp.connect(env(0.8, 0.002, 0.15));
+    n.start(when);
+  } else if (name === "swipe") {
+    const n = noise(ctx, 0.4);
+    const f = ctx.createBiquadFilter();
+    f.type = "bandpass";
+    f.Q.value = 1.5;
+    f.frequency.setValueAtTime(4200, when);
+    f.frequency.exponentialRampToValueAtTime(500, when + 0.3);
+    n.connect(f);
+    f.connect(env(0.7, 0.04, 0.32));
+    n.start(when);
   } else {
     [0, 0.085].forEach((offset) => {
       const n = noise(ctx, 0.05);
