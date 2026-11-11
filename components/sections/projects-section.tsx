@@ -7,8 +7,8 @@ import { webProjects } from "@/lib/data/projects";
 import { sectionSpacing } from "@/lib/section-style";
 import type { SectionProps } from "@/lib/types";
 
-function hostOf(url: string): string {
-  return new URL(url).host;
+function hostOf(url?: string): string {
+  return url ? new URL(url).host : "Coming soon";
 }
 
 export function ProjectsSection({ page = false }: SectionProps) {
@@ -67,7 +67,11 @@ export function ProjectsSection({ page = false }: SectionProps) {
                     ))}
                   </ul>
 
-                  {project.kind === "app" ? (
+                  {!project.url ? (
+                    project.action?.note ? (
+                      <p className="mt-7 font-mono text-xs text-ink-muted">{project.action.note}</p>
+                    ) : null
+                  ) : project.kind === "app" ? (
                     <div className="mt-7 flex flex-col items-start gap-2">
                       <a href={project.url} className="btn-glass">
                         {project.action?.label ?? "Download"}

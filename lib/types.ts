@@ -51,8 +51,8 @@ export interface WebProject {
   name: string;
   category: string;
   description: string;
-  /** Live URL supplied by the owner. */
-  url: string;
+  /** Live URL supplied by the owner. Omit while the site is not deployed yet. */
+  url?: string;
   highlights: string[];
   /** True for the portfolio site itself. */
   isThisSite?: boolean;

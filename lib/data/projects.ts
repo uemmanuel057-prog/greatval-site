@@ -46,6 +46,17 @@ export const webProjects: WebProject[] = [
     action: { label: "Test beta version", note: "Android only · 116 MB download" },
   },
   {
+    id: "evad-stars-academy",
+    name: "Evad Stars Academy",
+    category: "School website",
+    description:
+      "Website for a school in Apo Wumba, Abuja covering Early Years, Primary and Secondary education, built as a multi-page static site.",
+    highlights: ["About", "Academics", "Admissions", "School life", "Contact"],
+    status: "in-progress",
+    platformLabel: "School website · In build",
+    action: { label: "", note: "Not live yet" },
+  },
+  {
     id: "great-val",
     name: "GREAT VAL",
     category: "Personal brand & portfolio",
