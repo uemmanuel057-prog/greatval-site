@@ -32,6 +32,9 @@ export function AdminBar({ title }: { title: string }) {
             <Link href="/admin/reel" className="text-ink-muted transition-colors hover:text-accent">
               Reel editor
             </Link>
+            <Link href="/admin/3d" className="text-ink-muted transition-colors hover:text-accent">
+              3D preview
+            </Link>
             <Link href="/admin/schedule" className="text-ink-muted transition-colors hover:text-accent">
               Command Center
             </Link>
