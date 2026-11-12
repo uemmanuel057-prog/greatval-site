@@ -13,7 +13,6 @@ export interface Hero3DStatus {
 
 const labels: Record<SceneKind, string> = {
   bricks: "Gold bricks stacking into a wall",
-  monogram: "A rotating gold GV monogram",
   phone: "A phone showing the GREAT VAL video studio",
 };
 
@@ -35,13 +34,6 @@ function Flat({ kind }: { kind: SceneKind }) {
             ))}
           </div>
         ))}
-      </div>
-    );
-  }
-  if (kind === "monogram") {
-    return (
-      <div className="grid h-full place-items-center" aria-hidden="true">
-        <span className="bg-gradient-to-b from-[#f7d27a] to-[#c98a1c] bg-clip-text text-[7rem] font-black leading-none tracking-tighter text-transparent sm:text-[9rem]">GV</span>
       </div>
     );
   }

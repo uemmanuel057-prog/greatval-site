@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
-export type SceneKind = "bricks" | "monogram" | "phone";
+export type SceneKind = "bricks" | "phone";
 
 export interface SceneOptions {
   /** Called if the animation runs too slowly on this device. */
@@ -88,78 +88,6 @@ function buildBricks(): Built {
     dispose() {
       geometry.dispose();
       materials.forEach((m) => m.dispose());
-    },
-  };
-}
-
-// ---- 2. a gold GV monogram ----
-
-function gShape(): THREE.Shape {
-  const R = 1.2;
-  const r = 0.78;
-  const a0 = Math.PI / 4;
-  const shape = new THREE.Shape();
-  shape.moveTo(R * Math.cos(a0), R * Math.sin(a0));
-  const steps = 56;
-  for (let i = 1; i <= steps; i++) {
-    const a = a0 + ((2 * Math.PI - a0) * i) / steps;
-    shape.lineTo(R * Math.cos(a), R * Math.sin(a));
-  }
-  shape.lineTo(0.1, 0);
-  shape.lineTo(0.1, -0.3);
-  const aBar = 2 * Math.PI + Math.asin(-0.3 / r);
-  shape.lineTo(r * Math.cos(aBar), r * Math.sin(aBar));
-  for (let i = 1; i <= steps; i++) {
-    const a = aBar - ((aBar - a0) * i) / steps;
-    shape.lineTo(r * Math.cos(a), r * Math.sin(a));
-  }
-  shape.closePath();
-  return shape;
-}
-
-function vShape(): THREE.Shape {
-  const s = new THREE.Shape();
-  const pts: [number, number][] = [
-    [-0.85, 1.2],
-    [-0.3, 1.2],
-    [0, 0.2],
-    [0.3, 1.2],
-    [0.85, 1.2],
-    [0.3, -1.2],
-    [-0.3, -1.2],
-  ];
-  s.moveTo(...pts[0]);
-  pts.slice(1).forEach((p) => s.lineTo(...p));
-  s.closePath();
-  return s;
-}
-
-function buildMonogram(): Built {
-  const group = new THREE.Group();
-  const settings = { depth: 0.55, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.07, bevelSegments: 3, curveSegments: 40 };
-  const g = new THREE.ExtrudeGeometry(gShape(), settings);
-  const v = new THREE.ExtrudeGeometry(vShape(), settings);
-  g.center();
-  v.center();
-  const material = goldMaterial();
-  const gMesh = new THREE.Mesh(g, material);
-  const vMesh = new THREE.Mesh(v, material);
-  gMesh.position.x = -1.25;
-  vMesh.position.x = 1.3;
-  group.add(gMesh, vMesh);
-  group.scale.setScalar(1.2);
-
-  return {
-    group,
-    update(t, pointer) {
-      group.rotation.y = Math.sin(t * 0.5) * 0.45 + pointer.x * 0.6;
-      group.rotation.x = -pointer.y * 0.3 + Math.sin(t * 0.7) * 0.05;
-      group.position.y = Math.sin(t * 0.9) * 0.1;
-    },
-    dispose() {
-      g.dispose();
-      v.dispose();
-      material.dispose();
     },
   };
 }
@@ -313,7 +241,7 @@ export function createScene(kind: SceneKind, canvas: HTMLCanvasElement, options:
   rim.position.set(-5, 2, -4);
   scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.25));
 
-  const built = kind === "bricks" ? buildBricks() : kind === "monogram" ? buildMonogram() : buildPhone();
+  const built = kind === "bricks" ? buildBricks() : buildPhone();
   scene.add(built.group);
 
   const pointer = { x: 0, y: 0 };

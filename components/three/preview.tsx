@@ -8,7 +8,6 @@ import { Hero3D, type Force, type Hero3DStatus } from "./hero-3d";
 
 const options: { id: SceneKind; title: string; note: string }[] = [
   { id: "bricks", title: "Gold bricks", note: "Lays itself brick by brick. Tap it to replay. Ties to One Brick at a Time." },
-  { id: "monogram", title: "GV monogram", note: "A gold GV that turns with your finger or cursor." },
   { id: "phone", title: "Video Studio phone", note: "Shows the Studio running. Good for promoting the tool." },
 ];
 
@@ -33,7 +32,7 @@ export function ThreePreview() {
       <Container>
         <h1 className="text-3xl font-bold sm:text-4xl">3D preview</h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-muted sm:text-base">
-          Three centrepiece options for the homepage. Open this page on your phone to see what it would get.
+          Two centrepiece options for the homepage. Open this page on your phone to see what it would get.
         </p>
 
         <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
