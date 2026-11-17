@@ -58,6 +58,28 @@ export const webProjects: WebProject[] = [
     action: { label: "Visit site", note: "Work in progress" },
   },
   {
+    id: "campus-life",
+    name: "Campus Life",
+    category: "Browser game · Simulation",
+    description:
+      "A 3D campus life simulation that runs in the browser, set at Federal University Otuoke and growing to more campuses, with its own multiplayer server.",
+    highlights: ["Three.js", "Physics", "Multiplayer", "Installable on phones", "Multiple campuses"],
+    status: "in-progress",
+    platformLabel: "Browser game · Launch prep",
+    action: { label: "", note: "Not live yet" },
+  },
+  {
+    id: "cartel",
+    name: "Cartel",
+    category: "E-commerce platform",
+    description:
+      "A multi-tenant online shopping mall: vendors rent a space and get their own storefront, and shoppers browse every store in one place. A companion mobile app is in its early foundation.",
+    highlights: ["Next.js", "Supabase", "Paystack", "Expo mobile app", "Working name"],
+    status: "in-progress",
+    platformLabel: "Platform · In development",
+    action: { label: "", note: "Not live yet" },
+  },
+  {
     id: "great-val",
     name: "GREAT VAL",
     category: "Personal brand & portfolio",
