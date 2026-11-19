@@ -16,6 +16,7 @@ import {
   type TextLayer,
   type Transform,
 } from "./types";
+import { applyStyle, clearStyle, type ReelStyle } from "./styles";
 
 const MIN_CLIP = 0.2;
 
@@ -183,7 +184,10 @@ export type Action =
   | { type: "setBackground"; background: Background }
   | { type: "setMix"; mix: Mix }
   | { type: "setRatio"; ratio: RatioId }
-  | { type: "setOverlays"; overlays: Overlays };
+  | { type: "setOverlays"; overlays: Overlays }
+  | { type: "applyStyle"; style: ReelStyle }
+  | { type: "clearStyle" }
+  | { type: "setClips"; clips: Clip[] };
 
 /** Splits one clip in two at timeline time `t`. Returns null when the point is too close to an edge. */
 function splitClip(clips: Clip[], t: number): { clips: Clip[]; at: number } | null {
@@ -212,6 +216,12 @@ function splitClip(clips: Clip[], t: number): { clips: Clip[]; at: number } | nu
 
 export function reduceProject(p: Project, a: Action): Project {
   switch (a.type) {
+    case "applyStyle":
+      return applyStyle(p, a.style);
+    case "clearStyle":
+      return clearStyle(p);
+    case "setClips":
+      return { ...p, clips: a.clips };
     case "addClip":
       return { ...p, clips: [...p.clips, a.clip] };
     case "updateClip":

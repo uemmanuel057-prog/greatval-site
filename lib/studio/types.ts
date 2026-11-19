@@ -131,6 +131,8 @@ export interface Clip {
   transition: Transition;
   voice: VoiceEffect;
   cleanVoice: boolean;
+  /** True for a piece made by "Cut the pauses": it joins the clip before it with a hard cut, never a transition. */
+  joined?: boolean;
 }
 
 export type TextPosition = "top" | "middle" | "bottom";
@@ -220,6 +222,8 @@ export interface Project {
   mix: Mix;
   ratio: RatioId;
   overlays: Overlays;
+  /** The one-tap Reel style last applied, if any. */
+  styleId: string | null;
 }
 
 export type Selection =
@@ -290,4 +294,5 @@ export const initialProject: Project = {
     lowerThird: { on: false, title: "", subtitle: "" },
     banner: { on: false, text: "greatval.co" },
   },
+  styleId: null,
 };

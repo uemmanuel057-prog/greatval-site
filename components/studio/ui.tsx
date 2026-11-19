@@ -147,7 +147,8 @@ export interface PanelProps {
   selection: Selection;
   setSelection: (s: Selection) => void;
   total: number;
-  notify: (message: string) => void;
+  /** Shows a message above the editor. Errors are red; "info" is for good news. */
+  notify: (message: string, kind?: "info" | "error") => void;
   run: TaskRunner;
   /** Opens the file chooser, then hands the chosen file to `onFile`. */
   pick: (accept: string, onFile: (file: File) => void) => void;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { Crop, Download, Film, Layers, Music, Palette, Pause, Play, Redo2, Scissors, Sparkles, Type, Undo2, X, ZoomIn } from "lucide-react";
+import { Crop, Download, Film, Layers, Music, Palette, Pause, Play, Redo2, Scissors, Sparkles, Type, Undo2, Wand2, X, ZoomIn } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { trackPoint } from "@/lib/studio/analysis";
 import { StudioEngine } from "@/lib/studio/engine";
@@ -12,13 +12,15 @@ import { AudioPanel } from "./panels-audio";
 import { CanvasPanel, OverlayPanel, TextPanel } from "./panels-create";
 import { EditPanel, LookPanel, MotionPanel, NoClip } from "./panels-edit";
 import { InstallApp } from "./install-app";
+import { StylePanel } from "./panel-style";
 import { Timeline } from "./timeline";
 import { Empty, Note, type PanelProps, type TaskRunner } from "./ui";
 import { useEngineValue } from "./use-engine-value";
 
-type TabId = "edit" | "look" | "motion" | "audio" | "text" | "overlay" | "canvas" | "export";
+type TabId = "style" | "edit" | "look" | "motion" | "audio" | "text" | "overlay" | "canvas" | "export";
 
 const tabs: { id: TabId; label: string; icon: typeof Scissors }[] = [
+  { id: "style", label: "Style", icon: Wand2 },
   { id: "edit", label: "Edit", icon: Scissors },
   { id: "look", label: "Look", icon: Palette },
   { id: "motion", label: "Motion", icon: Sparkles },
@@ -66,11 +68,16 @@ export function Studio() {
   const [sources, setSources] = useState<Source[]>([]);
   const [selection, setSelection] = useState<Selection>(null);
   const [lastClipId, setLastClipId] = useState<string | null>(null);
-  const [tab, setTab] = useState<TabId>("edit");
+  const [tab, setTab] = useState<TabId>("style");
   const [quality, setQuality] = useState<QualityId>("720");
   const [zoom, setZoom] = useState(60);
   const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState("");
+  const [notice, setNoticeText] = useState("");
+  const [noticeKind, setNoticeKind] = useState<"info" | "error">("error");
+  const setNotice = useCallback((message: string, kind: "info" | "error" = "error") => {
+    setNoticeText(message);
+    setNoticeKind(kind);
+  }, []);
   const [exportState, setExportState] = useState<ExportState>({ status: "idle" });
   const [dragging, setDragging] = useState(false);
   const [task, setTask] = useState<{ label: string; progress: number | null } | null>(null);
@@ -115,7 +122,7 @@ export function Studio() {
       taskRunning.current = false;
       setTask(null);
     }
-  }, []);
+  }, [setNotice]);
 
   const addMedia = useCallback(
     async (file: File): Promise<Source | null> => {
@@ -129,7 +136,7 @@ export function Studio() {
         return null;
       }
     },
-    [engine],
+    [engine, setNotice],
   );
 
   const pick = useCallback((accept: string, onFile: (file: File) => void) => {
@@ -164,7 +171,7 @@ export function Studio() {
       }
       setLoading(false);
     },
-    [engine, addMedia],
+    [engine, addMedia, setNotice],
   );
 
   const select = useCallback((s: Selection) => {
@@ -290,7 +297,7 @@ export function Studio() {
 
   const panelProps: PanelProps = useMemo(
     () => ({ project, dispatch, engine, sources, selection, setSelection: select, total, notify: setNotice, run, pick, addMedia, busy }),
-    [project, engine, sources, selection, select, total, run, pick, addMedia, busy],
+    [project, engine, sources, selection, select, total, run, pick, addMedia, busy, setNotice],
   );
 
   const tabBar = (className: string) => (
@@ -321,6 +328,8 @@ export function Studio() {
       return <Empty>Add a video to start editing. Everything stays on your device.</Empty>;
     }
     switch (tab) {
+      case "style":
+        return <StylePanel {...panelProps} />;
       case "edit":
         return clip ? <EditPanel {...panelProps} clip={clip} index={clipIndex} /> : <NoClip />;
       case "look":
@@ -473,7 +482,12 @@ export function Studio() {
 
           <div className="min-w-0 space-y-3 lg:col-start-1 lg:row-start-2">
             {notice ? (
-              <p role="alert" className="flex items-start justify-between gap-3 rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">
+              <p
+                role={noticeKind === "error" ? "alert" : "status"}
+                className={`flex items-start justify-between gap-3 rounded-xl border px-3 py-2 text-sm ${
+                  noticeKind === "error" ? "border-red-400/30 bg-red-400/10 text-red-200" : "border-accent/30 bg-accent/10 text-ink"
+                }`}
+              >
                 <span>{notice}</span>
                 <button type="button" aria-label="Dismiss message" onClick={() => setNotice("")} className="shrink-0 opacity-70 hover:opacity-100">
                   <X size={15} aria-hidden="true" />
@@ -506,7 +520,7 @@ export function Studio() {
           </div>
 
           <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
-            <div className="hidden lg:block">{tabBar("grid grid-cols-4 gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5")}</div>
+            <div className="hidden lg:block">{tabBar("grid grid-cols-3 gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5")}</div>
             <div className="h-3 hidden lg:block" />
             <div className="card !p-4 sm:!p-5">{renderPanel()}</div>
           </div>
