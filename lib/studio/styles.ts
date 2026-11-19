@@ -1,5 +1,6 @@
 import type { Cut } from "@/lib/reel/edl";
-import { filterPresets, neutralAdjust, type CaptionStyle, type Clip, type Project, type SfxName, type TransitionType } from "./types";
+import { filterPresets, neutralAdjust, type CaptionStyle, type Clip, type Keyframe, type Project, type Recipe, type SfxName, type TransitionType } from "./types";
+import { clipDuration } from "./project";
 
 /**
  * One-tap Reel styles. A style sets the whole look at once: captions, colour, transitions,
@@ -152,10 +153,12 @@ export function clearStyle(p: Project): Project {
       adjust: neutralAdjust,
       transition: { type: "none", duration: c.transition.duration },
       crop: c.crop.zoom === PUNCH_ZOOM ? { ...c.crop, zoom: 1 } : c.crop,
+      keys: c.keys.filter((k) => !k.auto),
     })),
     transitionSfx: "none",
     captionSfx: "none",
     styleId: null,
+    recipe: undefined,
   };
 }
 
@@ -182,7 +185,7 @@ export function cutPauses(clips: Clip[], keepFor: (sourceId: string) => Cut[] | 
   const out: Clip[] = [];
   for (const c of clips) {
     const cuts = keepFor(c.sourceId);
-    if (!cuts || c.freeze !== undefined || c.reverse || c.curve !== "none" || c.keys.length > 0) {
+    if (!cuts || c.freeze !== undefined || c.reverse || c.curve !== "none" || c.keys.some((k) => !k.auto)) {
       if (cuts) skipped++;
       out.push(c);
       continue;
@@ -204,10 +207,105 @@ export function cutPauses(clips: Clip[], keepFor: (sourceId: string) => Cut[] | 
     pieces.forEach(([a, b], i) => {
       out.push(
         i === 0
-          ? { ...c, in: a, out: b }
-          : { ...c, id: makeId(), in: a, out: b, joined: true, transition: { type: "none", duration: c.transition.duration } },
+          ? { ...c, in: a, out: b, keys: [] }
+          : { ...c, id: makeId(), in: a, out: b, keys: [], joined: true, transition: { type: "none", duration: c.transition.duration } },
       );
     });
   }
   return { clips: out, saved, removed, skipped };
+}
+
+// ---- the edit builder ----
+
+/** The parts of a recipe, applied one at a time so you can watch the edit come together. */
+export type RecipePart = "look" | "transitions" | "motion" | "overlays" | "captions";
+
+export function styleToRecipe(s: ReelStyle, base: Recipe): Recipe {
+  return {
+    ...base,
+    look: s.filter,
+    caption: s.caption,
+    captionSfx: s.captionSfx,
+    transition: s.transition,
+    transitionDuration: s.transitionDuration,
+    transitionSfx: s.transitionSfx,
+    motion: s.punchIn ? "punch" : "none",
+  };
+}
+
+export function defaultRecipe(p: Project): Recipe {
+  if (p.recipe) return p.recipe;
+  return {
+    ...styleToRecipe(reelStyles[0], {} as Recipe),
+    pace: "natural",
+    watermark: p.overlays.watermark,
+    lowerThird: { ...p.overlays.lowerThird },
+    banner: { ...p.overlays.banner },
+  };
+}
+
+const PUSH_ZOOM = 1.12;
+
+function motionKeys(c: Clip, motion: Recipe["motion"], index: number): Keyframe[] {
+  const own = c.keys.filter((k) => !k.auto);
+  if (motion === "push" || motion === "drift") {
+    const d = clipDuration(c);
+    if (d < 0.3) return own;
+    const dir = index % 2 ? -1 : 1;
+    const auto: Keyframe[] =
+      motion === "push"
+        ? [
+            { t: 0, values: { scale: 1 }, auto: true },
+            { t: d, values: { scale: PUSH_ZOOM }, auto: true },
+          ]
+        : [
+            { t: 0, values: { scale: PUSH_ZOOM, x: -0.035 * dir }, auto: true },
+            { t: d, values: { scale: PUSH_ZOOM, x: 0.035 * dir }, auto: true },
+          ];
+    return [...own, ...auto];
+  }
+  return own;
+}
+
+/** Applies one part of a recipe. Pure, so it runs inside the reducer and Undo works. */
+export function applyRecipePart(p: Project, r: Recipe, part: RecipePart): Project {
+  switch (part) {
+    case "look": {
+      const preset = filterPresets.find((f) => f.id === r.look);
+      return { ...p, clips: p.clips.map((c) => ({ ...c, filter: r.look, adjust: { ...neutralAdjust, ...(preset?.adjust ?? {}) } })), recipe: r };
+    }
+    case "transitions":
+      return {
+        ...p,
+        clips: p.clips.map((c, i) => ({ ...c, transition: { type: i > 0 && !c.joined ? r.transition : "none", duration: r.transitionDuration } })),
+        transitionSfx: r.transition === "none" ? "none" : r.transitionSfx,
+        recipe: r,
+      };
+    case "motion": {
+      let zoomed = false;
+      return {
+        ...p,
+        clips: p.clips.map((c, i) => {
+          if (i > 0) zoomed = !zoomed;
+          const crop = r.motion === "punch" ? { ...c.crop, zoom: zoomed ? PUNCH_ZOOM : 1 } : c.crop.zoom === PUNCH_ZOOM ? { ...c.crop, zoom: 1 } : c.crop;
+          return { ...c, crop, keys: c.freeze !== undefined ? c.keys : motionKeys(c, r.motion, i) };
+        }),
+        recipe: r,
+      };
+    }
+    case "overlays":
+      return {
+        ...p,
+        overlays: { watermark: r.watermark, lowerThird: { ...r.lowerThird }, banner: { ...r.banner } },
+        recipe: r,
+      };
+    case "captions":
+      return {
+        ...p,
+        captionStyle: r.caption === "off" ? p.captionStyle : r.caption,
+        captionSfx: r.caption === "off" ? "none" : r.captionSfx,
+        captions: r.caption === "off" ? [] : p.captions,
+        recipe: r,
+      };
+  }
 }

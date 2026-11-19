@@ -10,13 +10,14 @@ import {
   type OverlayLayer,
   type Overlays,
   type Project,
+  type Recipe,
   type RatioId,
   type SfxName,
   type SpeedCurve,
   type TextLayer,
   type Transform,
 } from "./types";
-import { applyStyle, clearStyle, type ReelStyle } from "./styles";
+import { applyRecipePart, applyStyle, clearStyle, type RecipePart, type ReelStyle } from "./styles";
 
 const MIN_CLIP = 0.2;
 
@@ -187,7 +188,8 @@ export type Action =
   | { type: "setOverlays"; overlays: Overlays }
   | { type: "applyStyle"; style: ReelStyle }
   | { type: "clearStyle" }
-  | { type: "setClips"; clips: Clip[] };
+  | { type: "setClips"; clips: Clip[] }
+  | { type: "applyRecipePart"; recipe: Recipe; part: RecipePart; styleId?: string | null };
 
 /** Splits one clip in two at timeline time `t`. Returns null when the point is too close to an edge. */
 function splitClip(clips: Clip[], t: number): { clips: Clip[]; at: number } | null {
@@ -220,6 +222,10 @@ export function reduceProject(p: Project, a: Action): Project {
       return applyStyle(p, a.style);
     case "clearStyle":
       return clearStyle(p);
+    case "applyRecipePart": {
+      const next = applyRecipePart(p, a.recipe, a.part);
+      return a.styleId === undefined ? next : { ...next, styleId: a.styleId };
+    }
     case "setClips":
       return { ...p, clips: a.clips };
     case "addClip":

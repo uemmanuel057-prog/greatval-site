@@ -329,7 +329,7 @@ export function Studio() {
     }
     switch (tab) {
       case "style":
-        return <StylePanel {...panelProps} />;
+        return <StylePanel {...panelProps} onRetouch={() => setTab("edit")} onExport={() => runExport("video")} />;
       case "edit":
         return clip ? <EditPanel {...panelProps} clip={clip} index={clipIndex} /> : <NoClip />;
       case "look":

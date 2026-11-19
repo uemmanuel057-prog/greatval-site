@@ -321,16 +321,26 @@ const easeOutBack = (v: number) => {
 
 function drawCaption(ctx: CanvasRenderingContext2D, line: CaptionWord[], t: number, style: CaptionStyle, w: number, h: number, short: number) {
   const tp = captionTemplates[style];
-  const size = Math.round(short * tp.size);
   const family = tp.font === "serif" ? SERIF : tp.font === "mono" ? MONO : FONT;
-  ctx.font = `${tp.italic ? "italic " : ""}${tp.weight} ${size}px ${family}`;
+  const words = line.map((x) => (tp.upper ? x.text.toUpperCase() : x.text));
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
   ctx.lineJoin = "round";
-  const words = line.map((x) => (tp.upper ? x.text.toUpperCase() : x.text));
-  const space = ctx.measureText(" ").width;
-  const widths = words.map((x) => ctx.measureText(x).width);
-  const total = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
+  const measure = (px: number) => {
+    ctx.font = `${tp.italic ? "italic " : ""}${tp.weight} ${px}px ${family}`;
+    const space = ctx.measureText(" ").width;
+    const widths = words.map((x) => ctx.measureText(x).width);
+    return { space, widths, total: widths.reduce((a, b) => a + b, 0) + space * (words.length - 1) };
+  };
+  let size = Math.round(short * tp.size);
+  let m = measure(size);
+  // Long lines shrink to fit, with room for the pop and bounce animations.
+  const room = w * 0.84;
+  if (m.total > room) {
+    size = Math.max(10, Math.floor(size * (room / m.total)));
+    m = measure(size);
+  }
+  const { space, widths, total } = m;
 
   const lineAge = clamp01((t - line[0].start) / 0.2);
   let lineAlpha = 1;

@@ -92,6 +92,8 @@ export interface Keyframe {
   /** Seconds from the start of the layer on the timeline. */
   t: number;
   values: Partial<Transform>;
+  /** Made by the edit builder's Motion choice, so a new choice can replace it without touching yours. */
+  auto?: boolean;
 }
 
 /** A point followed through the footage by the tracker. Coordinates are 0..1 inside the source frame. */
@@ -200,6 +202,21 @@ export interface Mix {
   sfx: number;
 }
 
+/** Everything the edit builder can do, chosen by you, then applied in one go. */
+export interface Recipe {
+  pace: "off" | "natural" | "tight";
+  look: string;
+  caption: CaptionStyle | "off";
+  captionSfx: SfxName | "none";
+  transition: TransitionType;
+  transitionDuration: number;
+  transitionSfx: SfxName | "none";
+  motion: "none" | "punch" | "push" | "drift";
+  watermark: boolean;
+  lowerThird: { on: boolean; title: string; subtitle: string };
+  banner: { on: boolean; text: string };
+}
+
 export interface Overlays {
   watermark: boolean;
   lowerThird: { on: boolean; title: string; subtitle: string };
@@ -224,6 +241,8 @@ export interface Project {
   overlays: Overlays;
   /** The one-tap Reel style last applied, if any. */
   styleId: string | null;
+  /** The choices last used in the edit builder, so they are there next time. */
+  recipe?: Recipe;
 }
 
 export type Selection =
