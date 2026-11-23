@@ -484,6 +484,43 @@ export interface Scene {
   logo: HTMLImageElement | null;
   bgImage: HTMLImageElement | null;
   scratch: Scratch;
+  /** 0..1: how much a cutaway photo is showing, which brings in the speaker circle. */
+  brollVis?: number;
+}
+
+/** The speaker in a small circle near the bottom while a cutaway photo fills the screen. */
+function drawSpeakerCircle(ctx: CanvasRenderingContext2D, main: LayerDraw, vis: number, w: number, h: number) {
+  if (!main.el || vis <= 0) return;
+  const short = Math.min(w, h);
+  const pop = 0.85 + 0.15 * Math.min(1, vis);
+  const d = short * 0.36 * pop;
+  const cx = w / 2;
+  const cy = h * (h > w ? 0.76 : 0.72);
+  // Square crop of the source, centred across and set high, where a face usually is.
+  // Reversed clips are drawn from smaller stored frames, so measure the picture itself.
+  const el = main.el as { videoWidth?: number; videoHeight?: number; width?: number; height?: number };
+  const ew = el.videoWidth || el.width || main.w;
+  const eh = el.videoHeight || el.height || main.h;
+  const side = Math.min(ew, eh) * 0.82;
+  const sx = (ew - side) / 2;
+  const sy = Math.min(Math.max(eh * 0.34 - side / 2, 0), eh - side);
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, vis);
+  ctx.shadowColor = "rgba(0,0,0,0.55)";
+  ctx.shadowBlur = short * 0.04;
+  ctx.beginPath();
+  ctx.arc(cx, cy, d / 2 + short * 0.008, 0, Math.PI * 2);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, d / 2, 0, Math.PI * 2);
+  ctx.clip();
+  const f = filterString(main.adjust);
+  if (f !== "none" && supportsFilter(ctx)) ctx.filter = f;
+  ctx.drawImage(main.el, sx, sy, side, side, cx - d / 2, cy - d / 2, d, d);
+  ctx.filter = "none";
+  ctx.restore();
 }
 
 /** Draws one frame: background, footage, picture in picture, text, captions and overlays. */
@@ -520,6 +557,7 @@ export function drawFrame(ctx: CanvasRenderingContext2D, s: Scene) {
   }
 
   for (const layer of s.layers) paintLayer(ctx, layer, w, h);
+  if (main && s.brollVis) drawSpeakerCircle(ctx, main, s.brollVis, w, h);
 
   for (const layer of project.texts) {
     if (layer.text.trim() && t >= layer.start && t < layer.end) drawText(ctx, layer, w, h, short, s.textAt[layer.id]);

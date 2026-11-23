@@ -646,6 +646,7 @@ export class StudioEngine {
     this.lastMain = main;
 
     const layers: LayerDraw[] = [];
+    let brollVis = 0;
     for (const layer of project.layers) {
       if (this.t < layer.start || this.t >= layer.end) continue;
       const rt = this.runtimes.get(layer.sourceId);
@@ -655,6 +656,25 @@ export class StudioEngine {
       if (layer.follow && main && found) {
         const p = this.followPoint(layer.follow, main, found.item.clip.sourceId, found.sourceTime, W, H);
         if (p) tf = { ...tf, x: (p.x - W / 2) / W, y: (p.y - H / 2) / H };
+      }
+      if (layer.broll) {
+        // Cutaway photo: fills the frame, fades in with a light leak and out again, in the same look as the video.
+        const local = this.t - layer.start;
+        const vis = Math.min(1, local / 0.3, (layer.end - this.t) / 0.3);
+        brollVis = Math.max(brollVis, vis);
+        layers.push({
+          el,
+          w: rt.source.width,
+          h: rt.source.height,
+          fit: "fill",
+          crop: { zoom: 1, x: 0, y: 0 },
+          tf,
+          adjust: main?.adjust ?? neutralAdjust,
+          mask: noMask,
+          shift: { x: 0, y: 0 },
+          trans: { ...noTrans, alpha: vis, leak: local < 0.4 ? 1 - local / 0.4 : 0 },
+        });
+        continue;
       }
       layers.push({
         el,
@@ -681,6 +701,7 @@ export class StudioEngine {
 
     const bgSource = project.background.imageSourceId ? this.runtimes.get(project.background.imageSourceId)?.image ?? null : null;
     return {
+      brollVis: project.speakerCircle ? brollVis : 0,
       width: W,
       height: H,
       project,

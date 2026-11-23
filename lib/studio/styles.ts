@@ -1,6 +1,6 @@
 import type { Cut } from "@/lib/reel/edl";
-import { filterPresets, neutralAdjust, type CaptionStyle, type Clip, type Keyframe, type Project, type Recipe, type SfxName, type TransitionType } from "./types";
-import { clipDuration } from "./project";
+import { baseTransform, filterPresets, neutralAdjust, noMask, type CaptionWord, type OverlayLayer, type CaptionStyle, type Clip, type Keyframe, type Project, type Recipe, type SfxName, type TransitionType } from "./types";
+import { clipDuration, newId, totalDuration } from "./project";
 
 /**
  * One-tap Reel styles. A style sets the whole look at once: captions, colour, transitions,
@@ -224,7 +224,7 @@ export function cutPauses(clips: Clip[], keepFor: (sourceId: string) => Cut[] | 
 // ---- the edit builder ----
 
 /** The parts of a recipe, applied one at a time so you can watch the edit come together. */
-export type RecipePart = "look" | "transitions" | "motion" | "overlays" | "captions";
+export type RecipePart = "look" | "transitions" | "motion" | "overlays" | "captions" | "broll";
 
 export function styleToRecipe(s: ReelStyle, base: Recipe): Recipe {
   return {
@@ -248,7 +248,50 @@ export function defaultRecipe(p: Project): Recipe {
     watermark: p.overlays.watermark,
     lowerThird: { ...p.overlays.lowerThird },
     banner: { ...p.overlays.banner },
+    broll: { photos: [], circle: true },
   };
+}
+
+/**
+ * Spreads the cutaway photos evenly across the video, each used once, starting on a caption line
+ * when there is one nearby so the picture lands with the words. Opens and closes on the speaker.
+ */
+export function placeBroll(totalSeconds: number, photos: string[], captions: CaptionWord[]): OverlayLayer[] {
+  if (!photos.length) return [];
+  const intro = Math.min(1.5, totalSeconds * 0.12);
+  const outro = Math.min(1, totalSeconds * 0.08);
+  const avail = totalSeconds - intro - outro;
+  if (avail < 1.5) return [];
+  const slot = avail / photos.length;
+  const length = Math.min(slot, Math.max(1.4, Math.min(3, slot * 0.75)));
+  const starts = captions.map((w) => w.start);
+  const layers: OverlayLayer[] = [];
+  photos.forEach((sourceId, i) => {
+    let start = intro + i * slot + (slot - length) / 2;
+    const near = starts.reduce((best, s) => (Math.abs(s - start) < Math.abs(best - start) ? s : best), Infinity);
+    if (Math.abs(near - start) <= 0.5) start = near;
+    const prevEnd = layers[layers.length - 1]?.end ?? 0;
+    start = Math.max(start, prevEnd + 0.4);
+    const end = Math.min(start + length, totalSeconds - outro);
+    if (end - start < 0.8) return;
+    layers.push({
+      id: newId("layer"),
+      sourceId,
+      kind: "image",
+      start,
+      end,
+      in: 0,
+      tf: { ...baseTransform },
+      keys: [
+        { t: 0, values: { scale: 1 }, auto: true },
+        { t: end - start, values: { scale: 1.1 }, auto: true },
+      ],
+      mask: noMask,
+      width: 1,
+      broll: true,
+    });
+  });
+  return layers;
 }
 
 const PUSH_ZOOM = 1.12;
@@ -306,6 +349,16 @@ export function applyRecipePart(p: Project, r: Recipe, part: RecipePart): Projec
         overlays: { watermark: r.watermark, lowerThird: { ...r.lowerThird }, banner: { ...r.banner } },
         recipe: r,
       };
+    case "broll": {
+      const kept = p.layers.filter((l) => !l.broll);
+      const photos = r.broll.photos;
+      return {
+        ...p,
+        layers: [...kept, ...placeBroll(totalDuration(p.clips), photos, p.captions)],
+        speakerCircle: photos.length > 0 && r.broll.circle,
+        recipe: r,
+      };
+    }
     case "captions":
       return {
         ...p,

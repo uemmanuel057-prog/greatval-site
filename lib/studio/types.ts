@@ -167,6 +167,8 @@ export interface OverlayLayer {
   mask: Mask;
   width: number; // fraction of the canvas width at scale 1
   follow?: Track;
+  /** A full-screen cutaway photo placed by the edit builder. Fills the frame and fades in with a light leak. */
+  broll?: boolean;
 }
 
 export type AudioKind = "music" | "sfx";
@@ -217,6 +219,8 @@ export interface Recipe {
   watermark: boolean;
   lowerThird: { on: boolean; title: string; subtitle: string };
   banner: { on: boolean; text: string };
+  /** Cutaway photos (source ids) spread across the video, with the speaker kept in a circle. */
+  broll: { photos: string[]; circle: boolean };
 }
 
 export interface Overlays {
@@ -245,6 +249,8 @@ export interface Project {
   styleId: string | null;
   /** The choices last used in the edit builder, so they are there next time. */
   recipe?: Recipe;
+  /** While a cutaway photo is on screen, show the speaker in a small circle. */
+  speakerCircle?: boolean;
 }
 
 export type Selection =

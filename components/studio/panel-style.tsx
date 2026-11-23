@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Check, Circle, Download, Loader2, Minus, Play, SlidersHorizontal, Wand2, X } from "lucide-react";
+import { Check, Circle, Download, ImagePlus, Loader2, Minus, Play, SlidersHorizontal, Wand2, X } from "lucide-react";
 import { CAPTION_DOWNLOAD_NOTE, transcribe } from "@/lib/studio/ai";
 import { formatTime } from "@/lib/studio/format";
 import { newId } from "@/lib/studio/project";
@@ -94,6 +94,7 @@ const stepLabels: Record<StepId, string> = {
   motion: "Adding motion",
   overlays: "Placing overlays",
   captions: "Writing captions",
+  broll: "Placing your photos",
 };
 
 function StepIcon({ status }: { status: StepStatus }) {
@@ -162,9 +163,11 @@ export function StylePanel({
   project,
   dispatch,
   engine,
+  sources,
   run,
   notify,
   busy,
+  addMedia,
   onRetouch,
   onExport,
 }: PanelProps & { onRetouch: () => void; onExport: () => void }) {
@@ -181,6 +184,7 @@ export function StylePanel({
     setStyleId(null);
   };
   const startStyle = reelStyles.find((s) => s.id === styleId);
+  const photoSources = recipe.broll.photos.map((id) => sources.find((s) => s.id === id)).filter((s): s is NonNullable<typeof s> => Boolean(s));
 
   async function findPauses(clips: Clip[], options: SilenceOptions, label: (s: string) => void): Promise<PauseCutResult> {
     if (!engine) throw new Error("The editor is still loading.");
@@ -200,7 +204,7 @@ export function StylePanel({
   async function make() {
     if (!engine) return;
     const r = recipe;
-    const order: StepId[] = ["pauses", "look", "transitions", "motion", "overlays", "captions"];
+    const order: StepId[] = ["pauses", "look", "transitions", "motion", "overlays", "captions", "broll"];
     let list: Step[] = order.map((id) => ({ id, label: stepLabels[id], status: "wait" }));
     const set = (id: StepId, status: StepStatus, note?: string) => {
       list = list.map((s) => (s.id === id ? { ...s, status, note } : s));
@@ -280,6 +284,19 @@ export function StylePanel({
           const message = error instanceof Error ? error.message : "";
           set("captions", "fail", message === "no speech" ? "No speech found" : "Could not be made on this device");
         }
+      }
+      // 7. cutaway photos, last so they can land on the caption lines
+      if (cancelled()) return;
+      const photos = r.broll.photos.filter((id) => sources.some((s) => s.id === id));
+      if (!photos.length) {
+        dispatch({ type: "applyRecipePart", recipe: { ...r, broll: { ...r.broll, photos: [] } }, part: "broll" });
+        set("broll", "skip", "No photos added");
+      } else {
+        set("broll", "doing");
+        label("Placing your photos...");
+        await wait(450);
+        dispatch({ type: "applyRecipePart", recipe: { ...r, broll: { ...r.broll, photos } }, part: "broll" });
+        set("broll", "done", `${photos.length} photo${photos.length === 1 ? "" : "s"}${r.broll.circle ? ", you in a circle" : ""}`);
       }
       progress(1);
       await wait(250);
@@ -399,6 +416,59 @@ export function StylePanel({
           ))}
         </PillRow>
         <Note>Removes the silent gaps between your sentences. Natural keeps a breath; Tight is faster.</Note>
+      </Group>
+
+      <Group title="Photos (B-roll)" open>
+        <p className="text-xs text-ink-muted">
+          Add pictures of what you talk about. They are spread across your video, about one every two seconds, with you in a small circle while each one shows.
+        </p>
+        {photoSources.length ? (
+          <ul className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6" aria-label="Photos in this edit">
+            {photoSources.map((s, i) => (
+              <li key={s.id} className="relative aspect-[3/4] overflow-hidden rounded-lg border border-white/10 bg-black/40">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={s.url} alt={`Photo ${i + 1}: ${s.name}`} className="size-full object-cover" />
+                <span className="absolute left-1 top-1 rounded bg-black/70 px-1 font-mono text-[10px] text-ink">{i + 1}</span>
+                <button
+                  type="button"
+                  aria-label={`Remove photo ${i + 1}`}
+                  onClick={() => change({ broll: { ...recipe.broll, photos: recipe.broll.photos.filter((id) => id !== s.id) } })}
+                  className="absolute right-1 top-1 grid size-6 place-items-center rounded-full bg-black/70 text-ink hover:bg-black"
+                >
+                  <X size={12} aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className={`btn-glass !min-h-10 cursor-pointer !px-4 text-sm ${busy ? "pointer-events-none opacity-50" : ""}`}>
+            <ImagePlus size={16} aria-hidden="true" />
+            {photoSources.length ? "Add more photos" : "Add photos"}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={async (e) => {
+                const files = [...(e.target.files ?? [])];
+                e.target.value = "";
+                const ids: string[] = [];
+                for (const file of files) {
+                  const source = await addMedia(file);
+                  if (source?.kind === "image") ids.push(source.id);
+                }
+                if (ids.length) setRecipe((r) => ({ ...r, broll: { ...r.broll, photos: [...r.broll.photos, ...ids] } }));
+              }}
+            />
+          </label>
+          {photoSources.length ? (
+            <Pill active={recipe.broll.circle} onClick={() => change({ broll: { ...recipe.broll, circle: !recipe.broll.circle } })}>
+              Keep me in a circle
+            </Pill>
+          ) : null}
+        </div>
+        <Note>Photos are used in the order shown. Use your own pictures or ones you have the rights to.</Note>
       </Group>
 
       <Group title="Look" open>
