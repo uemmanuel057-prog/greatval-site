@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Crop, Download, Film, Layers, Music, Palette, Pause, Play, Redo2, Scissors, Sparkles, Type, Undo2, Wand2, X, ZoomIn } from "lucide-react";
+import { setHeadlineFont } from "@/lib/studio/render";
 import { Container } from "@/components/ui/container";
 import { trackPoint } from "@/lib/studio/analysis";
 import { StudioEngine } from "@/lib/studio/engine";
@@ -48,7 +49,13 @@ function TimeReadout({ engine, total }: { engine: StudioEngine | null; total: nu
 
 const iconButton = "btn-glass !min-h-10 !min-w-10 !px-0 disabled:opacity-40";
 
-export function Studio() {
+export function Studio({ headlineFont }: { headlineFont?: string }) {
+  useEffect(() => {
+    if (!headlineFont) return;
+    setHeadlineFont(headlineFont);
+    // Canvas text does not fetch fonts by itself, so ask for it up front.
+    document.fonts?.load(`40px ${headlineFont}`).catch(() => undefined);
+  }, [headlineFont]);
   const [engine, setEngine] = useState<StudioEngine | null>(null);
   const engineRef = useRef<StudioEngine | null>(null);
   const canvasRef = useCallback((el: HTMLCanvasElement | null) => {

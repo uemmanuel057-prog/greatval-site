@@ -2,7 +2,7 @@ import { buildChain, playSfx, type Chain } from "./audio";
 import { stabilizeAt, trackAt, type StabilizeData } from "./analysis";
 import { loadSegmenter, type Segmenter } from "./ai";
 import { evalTransform, layout, locate, newId, playbackRateAt, sourceTimeAt, totalDuration } from "./project";
-import { captionLines, drawFrame, makeScratch, mapPoint, noTrans, unmapPoint, type LayerDraw, type Scene } from "./render";
+import { captionLines, captionWordsPerLine, drawFrame, makeScratch, mapPoint, noTrans, unmapPoint, type LayerDraw, type Scene } from "./render";
 import {
   canvasSize,
   initialProject,
@@ -134,7 +134,7 @@ export class StudioEngine {
     this.sfxEvents = [
       ...project.audio.filter((a) => a.kind === "sfx" && a.sfx).map((a) => ({ t: a.start, name: a.sfx as SfxName })),
       ...(project.captionSfx !== "none"
-        ? captionLines(project.captions).map((l) => ({ t: l[0].start, name: project.captionSfx as SfxName }))
+        ? captionLines(project.captions, captionWordsPerLine(project.captionStyle)).map((l) => ({ t: l[0].start, name: project.captionSfx as SfxName }))
         : []),
       ...(project.transitionSfx !== "none"
         ? layout(project.clips)
@@ -749,6 +749,10 @@ export class StudioEngine {
       t.scale = 0.6 + 0.4 * vis;
       t.rot = (out ? -1 : 1) * (1 - vis) * 0.6;
     } else if (type === "flash") t.flash = 1 - vis;
+    else if (type === "leak") {
+      t.alpha = 0.75 + 0.25 * vis;
+      t.leak = 1 - vis;
+    }
     else if (type === "shake") {
       t.dx = Math.sin(local * 70) * 0.035 * (1 - vis);
       t.dy = Math.cos(local * 53) * 0.02 * (1 - vis);

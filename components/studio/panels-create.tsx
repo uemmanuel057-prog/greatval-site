@@ -5,7 +5,7 @@ import { inputClass } from "@/components/graphics-generator/controls";
 import { CAPTION_DOWNLOAD_NOTE, transcribe } from "@/lib/studio/ai";
 import { formatTime } from "@/lib/studio/format";
 import { newId } from "@/lib/studio/project";
-import { captionLines } from "@/lib/studio/render";
+import { captionLines, captionWordsPerLine } from "@/lib/studio/render";
 import {
   baseTransform,
   noMask,
@@ -38,6 +38,7 @@ const captionStyles: { id: CaptionStyle; label: string }[] = [
   { id: "neon", label: "Neon glow" },
   { id: "slide", label: "Slide up" },
   { id: "wave", label: "Wave" },
+  { id: "reel", label: "Headline" },
 ];
 const sfxChoices: { id: SfxName | "none"; label: string }[] = [
   { id: "none", label: "None" },
@@ -62,7 +63,7 @@ export function TextPanel({
   onTrack,
 }: PanelProps & { layer?: TextLayer; onAddText: () => void; onTrack: (target: { kind: "text" | "layer"; id: string }) => void }) {
   const patch = (p: Partial<TextLayer>) => layer && dispatch({ type: "updateText", id: layer.id, patch: p });
-  const lines = captionLines(project.captions);
+  const lines = captionLines(project.captions, captionWordsPerLine(project.captionStyle));
 
   async function generate() {
     if (!engine) return;

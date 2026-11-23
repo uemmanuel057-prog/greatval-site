@@ -4,6 +4,12 @@ export const BRAND = { canvas: "#0B0F17", gold: "#E5A93C", ink: "#F8FAFC", muted
 
 const FONT = 'ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const SERIF = 'Georgia, "Times New Roman", serif';
+const HEADLINE_FALLBACK = 'Impact, "Arial Narrow Bold", "Arial Narrow", sans-serif';
+let HEADLINE = HEADLINE_FALLBACK;
+/** The page loads a condensed headline font and tells the renderer its name. */
+export function setHeadlineFont(family: string) {
+  HEADLINE = `${family}, ${HEADLINE_FALLBACK}`;
+}
 
 const sizeFactor = { s: 0.055, m: 0.078, l: 0.105 } as const;
 const yFactor = { top: 0.14, middle: 0.5, bottom: 0.7 } as const;
@@ -23,10 +29,10 @@ export interface LayerDraw {
   shift: { x: number; y: number };
   /** Width as a fraction of the canvas. Used by overlays instead of fit. */
   widthFrac?: number;
-  trans: { alpha: number; scale: number; wipe: number; dx: number; dy: number; wipeV: number; rot: number; flash: number };
+  trans: { alpha: number; scale: number; wipe: number; dx: number; dy: number; wipeV: number; rot: number; flash: number; leak: number };
 }
 
-export const noTrans = { alpha: 1, scale: 1, wipe: 1, dx: 0, dy: 0, wipeV: 1, rot: 0, flash: 0 };
+export const noTrans = { alpha: 1, scale: 1, wipe: 1, dx: 0, dy: 0, wipeV: 1, rot: 0, flash: 0, leak: 0 };
 
 interface Geometry {
   cx: number;
@@ -149,6 +155,23 @@ export function paintLayer(ctx: CanvasRenderingContext2D, L: LayerDraw, W: numbe
     ctx.fillRect(-g.dw / 2, -g.dh / 2, g.dw, g.dh);
     ctx.globalAlpha = alpha;
   }
+  if (L.trans.leak > 0) {
+    // A warm light leak washing in from the top corner.
+    const k = Math.min(L.trans.leak, 1);
+    const r = Math.hypot(g.dw, g.dh);
+    const grad = ctx.createRadialGradient(-g.dw * 0.3, -g.dh * 0.35, 0, -g.dw * 0.3, -g.dh * 0.35, r * 0.85);
+    grad.addColorStop(0, `rgba(255,232,190,${k})`);
+    grad.addColorStop(0.3, `rgba(255,150,70,${0.9 * k})`);
+    grad.addColorStop(0.65, `rgba(240,80,110,${0.45 * k})`);
+    grad.addColorStop(1, "rgba(236,72,120,0)");
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = grad;
+    ctx.fillRect(-g.dw / 2, -g.dh / 2, g.dw, g.dh);
+    ctx.fillStyle = `rgba(255,170,90,${0.4 * k})`;
+    ctx.fillRect(-g.dw / 2, -g.dh / 2, g.dw, g.dh);
+    ctx.globalCompositeOperation = "source-over";
+  }
   if (L.adjust.vignette > 0) {
     const r = Math.hypot(g.dw, g.dh) / 2;
     const grad = ctx.createRadialGradient(0, 0, r * 0.35, 0, 0, r);
@@ -258,6 +281,11 @@ function drawText(ctx: CanvasRenderingContext2D, layer: TextLayer, w: number, h:
 }
 
 /** Groups caption words into short lines that are shown one at a time. */
+/** How many words a caption template shows at once. */
+export function captionWordsPerLine(style: CaptionStyle): number {
+  return captionTemplates[style].maxWords ?? 4;
+}
+
 export function captionLines(words: CaptionWord[], maxWords = 4): CaptionWord[][] {
   const lines: CaptionWord[][] = [];
   let line: CaptionWord[] = [];
@@ -275,7 +303,7 @@ export function captionLines(words: CaptionWord[], maxWords = 4): CaptionWord[][
 
 type CaptionAnim = "none" | "pop" | "bounce" | "typewriter" | "slide" | "wave" | "fade";
 interface CaptionTemplate {
-  font: "sans" | "serif" | "mono";
+  font: "sans" | "serif" | "mono" | "headline";
   italic?: boolean;
   weight: number;
   size: number; // fraction of the short side
@@ -296,6 +324,12 @@ interface CaptionTemplate {
   reveal?: boolean;
   /** The spoken word grows slightly. */
   grow?: boolean;
+  /** Outline width as a fraction of the font size. Default 0.18 when stroke is on. */
+  strokeWidth?: number;
+  /** Words shown at once. Default 4. */
+  maxWords?: number;
+  /** Colour for key words (names, numbers, long words), with a matching glow. */
+  key?: string;
 }
 
 const captionTemplates: Record<CaptionStyle, CaptionTemplate> = {
@@ -309,7 +343,18 @@ const captionTemplates: Record<CaptionStyle, CaptionTemplate> = {
   neon: { font: "sans", weight: 800, size: 0.068, upper: true, y: 0.7, fill: "#E0F9FF", active: "#FFFFFF", dim: 0.75, stroke: false, glow: BRAND.cyan, anim: "fade" },
   slide: { font: "sans", weight: 800, size: 0.065, upper: false, y: 0.72, fill: "#FFFFFF", active: BRAND.gold, dim: 1, stroke: true, anim: "slide" },
   wave: { font: "sans", weight: 800, size: 0.068, upper: true, y: 0.7, fill: "#FFFFFF", active: BRAND.gold, dim: 1, stroke: true, anim: "wave" },
+  reel: { font: "headline", weight: 400, size: 0.085, upper: true, y: 0.52, fill: "#FFFFFF", active: "#FFFFFF", dim: 1, stroke: true, strokeWidth: 0.06, glow: "rgba(0,0,0,0.8)", anim: "pop", maxWords: 2, key: "#FFE135" },
 };
+
+/** Names, numbers and long words get the highlight colour, unless you set it per word. */
+function isKeyWord(word: CaptionWord, prev?: CaptionWord): boolean {
+  if (word.key !== undefined) return word.key;
+  const clean = word.text.replace(/[^\p{L}\p{N}]/gu, "");
+  if (/\d/.test(clean)) return true;
+  if (clean.length >= 8) return true;
+  // A capital letter in the middle of a sentence is usually a name.
+  return Boolean(prev) && /^\p{Lu}/u.test(clean) && !/[.!?]$/.test(prev!.text.trim()) && clean.length > 1 && clean !== "I";
+}
 
 const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1);
@@ -321,7 +366,7 @@ const easeOutBack = (v: number) => {
 
 function drawCaption(ctx: CanvasRenderingContext2D, line: CaptionWord[], t: number, style: CaptionStyle, w: number, h: number, short: number) {
   const tp = captionTemplates[style];
-  const family = tp.font === "serif" ? SERIF : tp.font === "mono" ? MONO : FONT;
+  const family = tp.font === "serif" ? SERIF : tp.font === "mono" ? MONO : tp.font === "headline" ? HEADLINE : FONT;
   const words = line.map((x) => (tp.upper ? x.text.toUpperCase() : x.text));
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
@@ -398,15 +443,19 @@ function drawCaption(ctx: CanvasRenderingContext2D, line: CaptionWord[], t: numb
       ctx.fill();
     }
     if (tp.stroke) {
-      ctx.lineWidth = Math.max(4, size * 0.18);
+      ctx.lineWidth = tp.strokeWidth ? Math.max(2, size * tp.strokeWidth) : Math.max(4, size * 0.18);
       ctx.strokeStyle = "rgba(0,0,0,0.78)";
       ctx.strokeText(text, tp.anim === "typewriter" ? (-widths[i] + ctx.measureText(text).width) / 2 : 0, 0);
     }
-    if (tp.glow) {
+    const key = tp.key && isKeyWord(wd, i > 0 ? line[i - 1] : undefined);
+    if (key) {
+      ctx.shadowColor = tp.key!;
+      ctx.shadowBlur = size * 0.45;
+    } else if (tp.glow) {
       ctx.shadowColor = tp.glow;
       ctx.shadowBlur = size * (style === "neon" ? (active ? 0.9 : 0.5) : 0.3);
     }
-    ctx.fillStyle = active ? tp.active : tp.fill;
+    ctx.fillStyle = key ? tp.key! : active ? tp.active : tp.fill;
     // Typewriter text is drawn from the left edge of its slot so letters do not slide.
     if (tp.anim === "typewriter") {
       ctx.textAlign = "left";
@@ -477,7 +526,7 @@ export function drawFrame(ctx: CanvasRenderingContext2D, s: Scene) {
   }
 
   if (project.captions.length) {
-    const line = captionLines(project.captions).find((l) => t >= l[0].start && t < l[l.length - 1].end + 0.15);
+    const line = captionLines(project.captions, captionWordsPerLine(project.captionStyle)).find((l) => t >= l[0].start && t < l[l.length - 1].end + 0.15);
     if (line) drawCaption(ctx, line, t, project.captionStyle, w, h, short);
   }
 

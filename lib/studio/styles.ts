@@ -23,6 +23,10 @@ export interface ReelStyle {
   transitionSfx: SfxName | "none";
   /** Zoom in a little on every other clip, the classic talking-head jump-cut look. */
   punchIn: boolean;
+  /** Overrides punchIn when set. */
+  motion?: Recipe["motion"];
+  /** How hard to cut the pauses when this style is the starting point. */
+  pace?: Recipe["pace"];
 }
 
 /** How far a punch-in zooms. Kept exact so clearing a style can find and undo it. */
@@ -32,16 +36,18 @@ export const reelStyles: ReelStyle[] = [
   {
     id: "great-val",
     name: "GREAT VAL",
-    vibe: "Gold captions, warm look, zoom cuts",
-    swatch: ["#2a1c05", "#0B0F17"],
-    ink: "#E8A93A",
-    caption: "gold",
+    vibe: "Headline captions, tight cuts, light leaks, slow push-ins",
+    swatch: ["#3a1d08", "#0B0F17"],
+    ink: "#FFFFFF",
+    caption: "reel",
     captionSfx: "none",
-    filter: "gold",
-    transition: "zoom",
-    transitionDuration: 0.4,
+    filter: "vivid",
+    transition: "leak",
+    transitionDuration: 0.5,
     transitionSfx: "whoosh",
-    punchIn: true,
+    punchIn: false,
+    motion: "push",
+    pace: "tight",
   },
   {
     id: "hype",
@@ -229,7 +235,8 @@ export function styleToRecipe(s: ReelStyle, base: Recipe): Recipe {
     transition: s.transition,
     transitionDuration: s.transitionDuration,
     transitionSfx: s.transitionSfx,
-    motion: s.punchIn ? "punch" : "none",
+    motion: s.motion ?? (s.punchIn ? "punch" : "none"),
+    pace: s.pace ?? base.pace ?? "natural",
   };
 }
 

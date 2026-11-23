@@ -60,7 +60,7 @@ export interface Mask {
 }
 export const noMask: Mask = { shape: "none", size: 0.7, invert: false };
 
-export type TransitionType = "none" | "fade" | "wipe" | "zoom" | "slide" | "slideUp" | "wipeDown" | "spin" | "flash" | "shake";
+export type TransitionType = "none" | "fade" | "wipe" | "zoom" | "slide" | "slideUp" | "wipeDown" | "spin" | "flash" | "shake" | "leak";
 export interface Transition {
   type: TransitionType;
   duration: number; // seconds, split across the end of the previous clip and the start of this one
@@ -186,8 +186,10 @@ export interface CaptionWord {
   text: string;
   start: number;
   end: number;
+  /** Highlight this word. When unset, the Headline style picks key words itself. */
+  key?: boolean;
 }
-export type CaptionStyle = "gold" | "box" | "serif" | "pop" | "karaoke" | "bounce" | "typewriter" | "neon" | "slide" | "wave";
+export type CaptionStyle = "gold" | "box" | "serif" | "pop" | "karaoke" | "bounce" | "typewriter" | "neon" | "slide" | "wave" | "reel";
 
 export type BackgroundKind = "color" | "glow" | "blur" | "image";
 export interface Background {

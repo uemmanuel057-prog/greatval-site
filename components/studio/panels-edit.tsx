@@ -404,6 +404,7 @@ const transitions: { id: TransitionType; label: string }[] = [
   { id: "spin", label: "Spin" },
   { id: "flash", label: "Flash" },
   { id: "shake", label: "Shake" },
+  { id: "leak", label: "Light leak" },
 ];
 const cutSounds: { id: SfxName | "none"; label: string }[] = [
   { id: "none", label: "None" },

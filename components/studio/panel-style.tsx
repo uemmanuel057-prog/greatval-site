@@ -20,6 +20,7 @@ const paces: { id: Recipe["pace"]; label: string; options?: SilenceOptions }[] =
 ];
 const captionChoices: { id: CaptionStyle | "off"; label: string }[] = [
   { id: "off", label: "No captions" },
+  { id: "reel", label: "Headline" },
   { id: "gold", label: "Gold" },
   { id: "pop", label: "Pop in" },
   { id: "karaoke", label: "Karaoke" },
@@ -42,6 +43,7 @@ const transitionChoices: { id: TransitionType; label: string }[] = [
   { id: "wipeDown", label: "Drop wipe" },
   { id: "spin", label: "Spin" },
   { id: "shake", label: "Shake" },
+  { id: "leak", label: "Light leak" },
 ];
 const lengths = [
   { value: 0.3, label: "Quick" },
@@ -107,6 +109,12 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** A small sample word drawn the way each caption template looks. */
 function Sample({ style, ink }: { style: CaptionStyle; ink: string }) {
   const base = "text-base font-black uppercase leading-none tracking-tight";
+  if (style === "reel")
+    return (
+      <span className="text-lg uppercase leading-none text-white" style={{ fontFamily: "var(--font-headline), Impact, sans-serif", textShadow: "0 2px 8px rgba(0,0,0,.8)" }}>
+        Build <span style={{ color: "#FFE135", textShadow: "0 0 10px #FFE135" }}>Value</span>
+      </span>
+    );
   if (style === "box") return <span className={`${base} rounded bg-accent px-1.5 py-0.5`} style={{ color: ink }}>Value</span>;
   if (style === "serif") return <span className="font-serif text-lg italic leading-none" style={{ color: ink }}>Value</span>;
   if (style === "neon") return <span className={base} style={{ color: ink, textShadow: `0 0 10px ${ink}` }}>Value</span>;
